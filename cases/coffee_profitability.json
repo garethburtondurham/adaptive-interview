@@ -1,0 +1,144 @@
+{
+    "title": "Coffee Shop Profitability",
+    "candidate_prompt": "Our client is BeanScene, a national coffee shop chain with 500 locations. Revenue has grown 5% year-over-year, but profits have dropped by 20% in the last 12 months. The CEO wants to know why profits are declining and what to do about it.",
+    "hidden_facts": {
+        "business_model": {
+            "revenue_split": {"coffee": 0.70, "food": 0.30},
+            "store_count": 500,
+            "avg_transaction": 8.50,
+            "daily_transactions_per_store": 400
+        },
+        "revenue_changes": {
+            "coffee_volume": "+10%",
+            "coffee_price": "0% (no change)",
+            "food_volume": "0% (flat)",
+            "food_price": "0% (no change)",
+            "total_revenue_growth": "+5%"
+        },
+        "cost_changes": {
+            "fixed_costs_rent": "0% (flat)",
+            "fixed_costs_labor": "+3% (slight increase)",
+            "variable_costs_beans": "+40% (Brazil drought)",
+            "variable_costs_cups_packaging": "+15%",
+            "variable_costs_food_ingredients": "+5%"
+        },
+        "market_context": {
+            "competitor_pricing": "Similar to BeanScene",
+            "customer_segments": "60% commuters, 30% remote workers, 10% students",
+            "price_sensitivity": "Moderate - premium positioning"
+        }
+    },
+    "question_sequence": [
+        {
+            "id": "q1_structure",
+            "phase": "STRUCTURING",
+            "prompt": "How would you structure your approach to understanding why profits are declining despite revenue growth?",
+            "key_elements": ["profit equation", "revenue breakdown", "cost breakdown", "fixed vs variable"],
+            "rubric": {
+                "1": "No clear structure. Lists random factors without organizing them logically.",
+                "2": "Mentions profit = revenue - costs but cannot break down further.",
+                "3": "Basic structure: looks at revenue side and cost side. May mention fixed/variable.",
+                "4": "Clear framework: breaks down revenue (price x volume) and costs (fixed/variable). Identifies need for trend data.",
+                "5": "Excellent: Structured approach with clear hypotheses. Recognizes revenue is UP so problem likely on cost side. Mentions margin analysis."
+            },
+            "hints": {
+                "level_1": "Let's start with the basics. What's the formula for profit?",
+                "level_2": "Good start. How might you break down the revenue side further?"
+            }
+        },
+        {
+            "id": "q2_hypothesis",
+            "phase": "STRUCTURING",
+            "prompt": "Given that revenue is UP 5% but profit is DOWN 20%, what does that tell you? Where would you focus first?",
+            "key_elements": ["costs increasing", "cost focus", "margin compression", "not a revenue problem"],
+            "rubric": {
+                "1": "Focuses on revenue despite being told it's growing. Misses the cost implication.",
+                "2": "Recognizes costs might be the issue but can't articulate why.",
+                "3": "Correctly identifies costs must be rising faster than revenue. Suggests looking at cost categories.",
+                "4": "Strong hypothesis: costs rising significantly. Asks about specific cost categories (COGS, labor, rent).",
+                "5": "Insightful: Quantifies that costs must be up ~25% to cause this. Prioritizes variable costs as likely culprit."
+            },
+            "hints": {
+                "level_1": "If revenue went up but profit went down, what must have happened to costs?",
+                "level_2": "Think about which costs would change the most when a coffee shop sells more coffee."
+            }
+        },
+        {
+            "id": "q3_cost_structure",
+            "phase": "ANALYSIS",
+            "prompt": "Good thinking. What are the main cost categories for a coffee shop chain? Which would you investigate first?",
+            "key_elements": ["COGS/ingredients", "labor", "rent", "fixed vs variable distinction"],
+            "rubric": {
+                "1": "Cannot name relevant cost categories for a coffee shop.",
+                "2": "Lists some costs but misses major categories or can't prioritize.",
+                "3": "Identifies main categories: ingredients/COGS, labor, rent, utilities. Basic prioritization.",
+                "4": "Good breakdown with fixed/variable distinction. Prioritizes variable costs given revenue increase.",
+                "5": "Sophisticated: Breaks down COGS by coffee beans, milk, cups. Notes coffee beans likely most volatile."
+            },
+            "hints": {
+                "level_1": "What categories of costs would a coffee shop have?",
+                "level_2": "Think about which costs change with volume vs which stay the same."
+            },
+            "complexity_additions": {
+                "strong_candidate": "Before I share the cost data, walk me through specifically what percentage increase in costs would cause a 20% profit decline. Assume costs were 80% of revenue."
+            }
+        },
+        {
+            "id": "q4_analysis",
+            "phase": "CALCULATION",
+            "prompt": "Coffee bean costs are up 40% due to a Brazil drought. Given that coffee is 70% of revenue and beans are typically 30% of coffee revenue, what's the impact on overall costs? Walk me through the math.",
+            "key_elements": ["percentage calculation", "cost impact", "margin math"],
+            "rubric": {
+                "1": "Cannot attempt the calculation or gets fundamentally wrong answer.",
+                "2": "Starts calculation but makes significant errors or cannot complete.",
+                "3": "Attempts calculation with minor errors. Gets approximately right answer.",
+                "4": "Correct calculation: 70% x 30% = 21% of revenue is beans. 40% increase = 8.4% additional cost.",
+                "5": "Precise and fast: 21% x 40% = 8.4pp cost increase. Notes this alone could explain much of the profit decline."
+            },
+            "hints": {
+                "level_1": "Let's break it down step by step. First, what percentage of total revenue goes to coffee beans?",
+                "level_2": "If beans are 30% of coffee revenue, and coffee is 70% of total revenue, what's 30% of 70%?"
+            },
+            "complexity_additions": {
+                "strong_candidate": "Good. Now packaging costs are also up 15% and represent 5% of revenue. What's the combined impact?"
+            }
+        },
+        {
+            "id": "q5_recommendation",
+            "phase": "SYNTHESIS",
+            "prompt": "Based on your analysis, what would you recommend BeanScene do to address the profit decline? Give me your top 2-3 recommendations.",
+            "key_elements": ["price increase", "cost reduction", "supplier negotiation", "menu optimization"],
+            "rubric": {
+                "1": "Vague recommendations without connection to analysis.",
+                "2": "Generic suggestions like 'cut costs' without specifics.",
+                "3": "Reasonable recommendations: raise prices, negotiate with suppliers. Basic reasoning.",
+                "4": "Strong recommendations with trade-offs: price increase (risk volume loss), alternative suppliers, menu redesign to reduce bean-heavy drinks.",
+                "5": "Strategic: Prioritized recommendations with implementation approach. Considers customer segments, competitive dynamics, phased rollout."
+            },
+            "hints": {
+                "level_1": "Think about the two main levers: revenue and costs. What can they do on each side?",
+                "level_2": "If costs went up, what are the options? Pass it to customers, absorb it, or reduce it somehow?"
+            },
+            "complexity_additions": {
+                "strong_candidate": "The CEO is worried about volume loss. How would you model the break-even point - how much volume can we lose before the price increase backfires?"
+            }
+        },
+        {
+            "id": "q6_synthesis",
+            "phase": "SYNTHESIS",
+            "prompt": "We're running short on time. If you had to walk into the CEO's office right now, what would you tell her? Give me your recommendation in 30 seconds.",
+            "key_elements": ["clear recommendation", "reasoning", "risks", "next steps"],
+            "rubric": {
+                "1": "Rambling, no clear recommendation, or recommendation doesn't follow from analysis.",
+                "2": "Has a recommendation but poorly structured, missing key supporting points.",
+                "3": "Clear recommendation (raise prices) with basic reasoning. Missing risks or next steps.",
+                "4": "Crisp: 'Raise prices 5-7% to offset bean cost increase. Main risk is volume loss. Test in select markets first.'",
+                "5": "CEO-ready: Clear recommendation, quantified impact, risk mitigation, and immediate next steps. Structured as situation-complication-resolution."
+            },
+            "hints": {
+                "level_1": "Start with your bottom line - what should they do?",
+                "level_2": "Think about it as: 'Here's what I recommend, here's why, here's the risk.'"
+            }
+        }
+    ]
+}
