@@ -9,6 +9,10 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+# Load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).parent.parent / ".env")
+
 import streamlit as st
 from case_loader import initialize_interview_state, get_available_cases
 from graph import InterviewRunner
@@ -47,31 +51,54 @@ with st.sidebar:
         st.subheader("Status")
         col1, col2 = st.columns(2)
         with col1:
-            st.metric("Difficulty", f"{state['difficulty_level']}/5")
+            st.metric("Phase", state.get("current_phase", "N/A"))
         with col2:
-            st.metric("Phase", state["current_phase"])
+            areas_explored = len(state.get("areas_explored", []))
+            total_areas = len(state.get("exploration_areas", []))
+            st.metric("Progress", f"{areas_explored}/{total_areas}")
 
-        st.metric("Questions Answered", len(state["question_scores"]))
+        # Count exchanges
+        candidate_msgs = [m for m in state.get("messages", []) if m["role"] == "candidate"]
+        st.metric("Exchanges", len(candidate_msgs))
 
-        # Progress bar
-        total_qs = len(state["question_sequence"])
-        current_q = state["current_question_index"]
-        progress = min(current_q / total_qs, 1.0) if total_qs > 0 else 0
-        st.progress(progress, text=f"Progress: {current_q}/{total_qs}")
+        # Progress bar based on areas explored
+        if total_areas > 0:
+            progress = min(areas_explored / total_areas, 1.0)
+            st.progress(progress, text=f"Areas Explored: {areas_explored}/{total_areas}")
 
-        # Scores section (collapsible)
-        with st.expander("Question Scores", expanded=False):
-            for qs in state["question_scores"]:
-                st.write(f"**{qs['question_id']}** ({qs['phase']})")
-                st.write(f"Score: {qs['score']}/5 | Difficulty: {qs['difficulty_at_time']}")
-                st.caption(qs["reasoning"][:150] + "...")
-                st.divider()
+        # Areas explored section
+        with st.expander("Areas Explored", expanded=False):
+            explored = state.get("areas_explored", [])
+            if explored:
+                for area in explored:
+                    st.write(f"✓ {area}")
+            else:
+                st.write("No areas explored yet")
+
+        # Performance signals section
+        with st.expander("Performance Signals", expanded=False):
+            positives = state.get("positive_signals", [])
+            concerns = state.get("concerns", [])
+
+            if positives:
+                st.write("**Strengths:**")
+                for signal in positives:
+                    st.write(f"✓ {signal}")
+
+            if concerns:
+                st.write("**Areas to Watch:**")
+                for concern in concerns:
+                    st.write(f"⚠ {concern}")
+
+            if not positives and not concerns:
+                st.write("No signals recorded yet")
 
         # Debug section (collapsible)
         with st.expander("Debug Info", expanded=False):
+            st.write(f"**Candidate Struggling:** {state.get('candidate_struggling', False)}")
             if state.get("last_evaluator_output"):
-                eval_out = state["last_evaluator_output"]
-                st.json(eval_out)
+                st.write("**Last Evaluator Output:**")
+                st.json(state["last_evaluator_output"])
 
         st.divider()
 
@@ -90,10 +117,10 @@ if not st.session_state.started:
     case study interviews similar to management consulting firms.
 
     **How it works:**
-    - The system adapts difficulty based on your performance
-    - Each response is scored against specific rubrics
-    - Strong candidates get harder follow-ups
-    - Struggling candidates receive helpful hints
+    - Have a natural conversation about the case
+    - The interviewer adapts based on your responses
+    - If you get stuck, the system provides subtle guidance
+    - Focus on your thinking process, not frameworks
     """)
 
     st.divider()
@@ -141,37 +168,40 @@ else:
         # Show final score
         final_score = state.get("final_score")
         if final_score:
-            st.metric("Final Score", f"{final_score}/5")
+            st.metric("Final Score", f"{final_score:.1f}/5")
 
         # Show summary
         st.subheader("Performance Summary")
 
-        scores = runner.get_scores()
-        if scores:
-            # Score distribution
-            score_values = [s["score"] for s in scores]
-            avg_score = sum(score_values) / len(score_values)
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            areas = state.get("areas_explored", [])
+            st.metric("Areas Explored", len(areas))
+        with col2:
+            positives = state.get("positive_signals", [])
+            st.metric("Strengths Shown", len(positives))
+        with col3:
+            msgs = [m for m in state.get("messages", []) if m["role"] == "candidate"]
+            st.metric("Total Exchanges", len(msgs))
 
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Average Score", f"{avg_score:.1f}/5")
-            with col2:
-                st.metric("Questions Answered", len(scores))
-            with col3:
-                difficulties = [s["difficulty_at_time"] for s in scores]
-                st.metric("Max Difficulty Reached", max(difficulties))
+        # Performance Summary
+        positives = state.get("positive_signals", [])
+        concerns = state.get("concerns", [])
 
-            # Detailed scores
-            st.subheader("Question-by-Question Breakdown")
-            for qs in scores:
-                with st.expander(f"{qs['question_id']} - Score: {qs['score']}/5"):
-                    st.write(f"**Phase:** {qs['phase']}")
-                    st.write(f"**Difficulty at time:** {qs['difficulty_at_time']}")
-                    st.write(f"**Reasoning:** {qs['reasoning']}")
-                    if qs["key_elements_detected"]:
-                        st.write("**Key elements detected:**")
-                        for elem in qs["key_elements_detected"]:
-                            st.write(f"  - {elem}")
+        if positives:
+            st.subheader("Strengths Demonstrated")
+            for signal in positives:
+                st.write(f"✓ {signal}")
+
+        if concerns:
+            st.subheader("Areas for Development")
+            for concern in concerns:
+                st.write(f"⚠ {concern}")
+
+        # Areas breakdown
+        st.subheader("Topics Covered")
+        for area in state.get("areas_explored", []):
+            st.write(f"• {area}")
 
         if st.button("Start New Interview", type="primary"):
             reset_interview()

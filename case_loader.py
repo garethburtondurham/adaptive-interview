@@ -36,11 +36,14 @@ def initialize_interview_state(
         case_title=case["title"],
         case_prompt=case["candidate_prompt"],
         hidden_facts=case["hidden_facts"],
-        question_sequence=case["question_sequence"],
+        exploration_areas=case["exploration_areas"],
         current_phase="INTRO",
-        current_question_index=0,
         difficulty_level=3,  # Start at medium
         messages=[],
+        areas_explored=[],
+        positive_signals=[],
+        concerns=[],
+        candidate_struggling=False,
         question_scores=[],
         last_evaluator_output=None,
         next_directive=None,
@@ -53,12 +56,18 @@ def initialize_interview_state(
     )
 
 
-def get_current_question(state: InterviewState) -> dict:
-    """Get the current question from the sequence."""
-    idx = state["current_question_index"]
-    if idx >= len(state["question_sequence"]):
-        return None
-    return state["question_sequence"][idx]
+def get_exploration_areas(state: InterviewState) -> list:
+    """Get all exploration areas for the case."""
+    return state["exploration_areas"]
+
+
+def get_unexplored_areas(state: InterviewState) -> list:
+    """Get exploration areas that haven't been covered yet."""
+    explored = set(state.get("areas_explored", []))
+    return [
+        area for area in state["exploration_areas"]
+        if area["id"] not in explored
+    ]
 
 
 def get_available_cases() -> List[str]:

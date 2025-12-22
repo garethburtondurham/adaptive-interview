@@ -1,6 +1,11 @@
 {
     "title": "SaaS Market Entry - Southeast Asia",
     "candidate_prompt": "Our client is CloudMetrics, a US-based B2B SaaS company that provides analytics dashboards for enterprise customers. They have $50M in annual revenue and are considering expanding into Southeast Asia. The CEO wants to know: should they enter this market, and if so, how?",
+    "case_objectives": [
+        "Evaluate market attractiveness of Southeast Asia",
+        "Assess company's right to win in this market",
+        "Recommend entry strategy if appropriate"
+    ],
     "hidden_facts": {
         "company_info": {
             "annual_revenue": "$50M",
@@ -29,114 +34,127 @@
             "acquisition": "Acquire local competitor DataViz Asia ($10M, 50 customers)"
         }
     },
-    "question_sequence": [
+    "exploration_areas": [
         {
-            "id": "q1_structure",
+            "id": "initial_thinking",
             "phase": "STRUCTURING",
-            "prompt": "How would you structure your analysis of whether CloudMetrics should enter Southeast Asia?",
-            "key_elements": ["market attractiveness", "company capability", "entry mode", "financial analysis"],
+            "description": "Understand how candidate thinks about market entry decisions",
+            "key_elements": ["market attractiveness", "company capability", "go/no-go criteria"],
+            "probing_angles": [
+                "What's your initial take on this?",
+                "What would you need to know to advise the CEO?",
+                "How do you think about market entry decisions?"
+            ],
             "rubric": {
-                "1": "No clear framework. Random list of considerations.",
-                "2": "Mentions market size but lacks comprehensive structure.",
-                "3": "Basic structure: market attractiveness + company fit. Missing entry mode or financials.",
-                "4": "Good framework: market analysis, competitive dynamics, capability assessment, entry options, financials.",
-                "5": "Excellent: Structured as Go/No-Go decision tree. Considers market attractiveness, right to win, entry modes, and investment requirements with clear decision criteria."
+                "weak": "No clear approach. Random list of considerations.",
+                "adequate": "Recognizes need to evaluate market and company fit.",
+                "strong": "Clear decision framework: market attractiveness, right to win, entry mode, financials."
             },
-            "hints": {
-                "level_1": "Think about what you'd need to know before recommending yes or no.",
-                "level_2": "Consider both the market opportunity and the company's ability to capture it."
-            }
+            "hints_if_stuck": [
+                "What would make you say yes versus no to this opportunity?",
+                "Think about what you'd need to believe for this to be a good idea."
+            ]
         },
         {
-            "id": "q2_market",
+            "id": "market_analysis",
             "phase": "ANALYSIS",
-            "prompt": "Let's start with market attractiveness. What would you want to know about the Southeast Asian market?",
-            "key_elements": ["market size", "growth", "customer segments", "competitive landscape"],
+            "description": "Evaluate the Southeast Asian market opportunity",
+            "key_elements": ["market size", "growth rate", "customer segments", "competitive landscape"],
+            "probing_angles": [
+                "What would you want to know about the market?",
+                "What makes a market attractive for a B2B SaaS company?",
+                "The market is $2B growing 25% annually - what do you make of that?"
+            ],
             "rubric": {
-                "1": "Generic questions not specific to B2B software or the region.",
-                "2": "Asks about market size but misses growth, competition, or customer dynamics.",
-                "3": "Asks about TAM, growth rate, and competition. Reasonable coverage.",
-                "4": "Asks about TAM by country, segment (SMB vs enterprise), growth drivers, and competitive intensity.",
-                "5": "Sophisticated: TAM/SAM/SOM distinction, growth drivers, customer adoption curve, competitive positioning, regulatory environment."
+                "weak": "Generic questions not specific to B2B software or region.",
+                "adequate": "Asks about TAM, growth, competition. Reasonable coverage.",
+                "strong": "Sophisticated: TAM/SAM/SOM, growth drivers, adoption curve, competitive positioning."
             },
-            "hints": {
-                "level_1": "What makes a market attractive for a B2B SaaS company?",
-                "level_2": "Think about size, growth, and who else is competing for these customers."
-            }
+            "hints_if_stuck": [
+                "What makes a market attractive for a software company specifically?",
+                "Think about size, growth, and who else is competing."
+            ]
         },
         {
-            "id": "q3_challenges",
+            "id": "challenges",
             "phase": "ANALYSIS",
-            "prompt": "The market looks attractive at $2B growing 25% annually. But what challenges might a US SaaS company face entering Southeast Asia?",
+            "description": "Identify challenges of entering Southeast Asia",
             "key_elements": ["localization", "payment methods", "data residency", "sales model", "cultural differences"],
+            "probing_angles": [
+                "What challenges might they face entering this region?",
+                "What's different about doing business in Southeast Asia versus the US?",
+                "What could go wrong?"
+            ],
             "rubric": {
-                "1": "Cannot identify meaningful challenges specific to the context.",
-                "2": "Mentions 'language' or 'culture' generically without depth.",
-                "3": "Identifies 2-3 relevant challenges: localization, local competition, different buyer behavior.",
-                "4": "Comprehensive: language/localization, payment infrastructure, data sovereignty, relationship-based selling, local presence needed.",
-                "5": "Expert level: Prioritizes challenges by impact, notes country-by-country variation, identifies which are solvable vs structural barriers."
+                "weak": "Cannot identify meaningful challenges specific to context.",
+                "adequate": "Identifies 2-3 relevant challenges: localization, local competition, buyer behavior.",
+                "strong": "Comprehensive and prioritized: language, payments, data sovereignty, relationship selling, country variation."
             },
-            "hints": {
-                "level_1": "Think about what's different about doing business in Southeast Asia vs the US.",
-                "level_2": "Consider product (language), sales (how they buy), and operations (regulations)."
-            },
-            "complexity_additions": {
-                "strong_candidate": "Good list. Now rank these by difficulty to overcome and explain your reasoning."
-            }
+            "hints_if_stuck": [
+                "Think about product, sales, and operations - what's different?",
+                "What would a US software company need to adapt?"
+            ]
         },
         {
-            "id": "q4_entry_mode",
+            "id": "entry_modes",
             "phase": "ANALYSIS",
-            "prompt": "Given these challenges, what are the different ways CloudMetrics could enter this market? What are the pros and cons of each?",
-            "key_elements": ["entry modes", "organic vs partner", "beachhead strategy", "phasing"],
+            "description": "Evaluate different ways to enter the market",
+            "key_elements": ["organic vs partner vs acquire", "beachhead strategy", "phasing", "trade-offs"],
+            "probing_angles": [
+                "How could they enter this market?",
+                "What are the trade-offs between different approaches?",
+                "Would you go alone or with a partner?"
+            ],
             "rubric": {
-                "1": "Only considers one option without evaluating alternatives.",
-                "2": "Lists options but cannot articulate pros/cons of each.",
-                "3": "Compares 2-3 entry modes (direct, partner, acquisition) with basic trade-offs.",
-                "4": "Evaluates options against company capabilities, recommends phased approach starting with one country.",
-                "5": "Strategic: Recommends beachhead market with clear criteria, outlines partnership model, phases investment, identifies success metrics."
+                "weak": "Only considers one option without alternatives.",
+                "adequate": "Compares 2-3 options with basic trade-offs.",
+                "strong": "Strategic: recommends beachhead market, considers phasing, identifies success metrics."
             },
-            "hints": {
-                "level_1": "What are the typical ways a company can enter a new geographic market?",
-                "level_2": "Think about building vs buying vs partnering."
-            },
-            "complexity_additions": {
-                "strong_candidate": "The CEO is impatient and wants to enter 3 countries simultaneously. How would you push back on that?"
-            }
+            "hints_if_stuck": [
+                "What are the typical ways companies enter new markets?",
+                "Think about build, buy, or partner."
+            ]
         },
         {
-            "id": "q5_financials",
+            "id": "financials",
             "phase": "CALCULATION",
-            "prompt": "Let's look at the numbers. If organic expansion costs $2M in year one with expected revenue of $500K, and partnership costs nothing upfront but gives away 15% of revenue, at what revenue level does organic become more attractive? Assume 5-year horizon.",
-            "key_elements": ["break-even analysis", "NPV thinking", "partnership math"],
+            "description": "Analyze the financial trade-offs",
+            "data_to_share": "Organic expansion costs $2M in year one with expected revenue of $500K. Partnership costs nothing upfront but gives away 15% of revenue.",
+            "key_elements": ["break-even analysis", "NPV thinking", "risk-adjusted returns"],
+            "probing_angles": [
+                "How would you compare these options financially?",
+                "At what point does one become better than the other?",
+                "Walk me through the math."
+            ],
             "rubric": {
-                "1": "Cannot set up the calculation.",
-                "2": "Attempts but makes fundamental errors in the comparison.",
-                "3": "Sets up correctly: organic costs $2M, partnership costs 15% of revenue. Gets approximate break-even.",
-                "4": "Correct: Break-even when 15% x Revenue x 5 years = $2M. Revenue = $2.67M over 5 years or ~$533K/year.",
-                "5": "Sophisticated: Accounts for time value of money, notes organic has higher upside if successful, considers risk-adjusted returns."
+                "weak": "Cannot set up the comparison.",
+                "adequate": "Sets up correctly, gets approximate break-even.",
+                "strong": "Correct math plus considers time value, upside potential, risk-adjusted returns."
             },
-            "hints": {
-                "level_1": "Set up the equation: when does the total cost of partnership equal the cost of going alone?",
-                "level_2": "Partnership cost over 5 years = 15% x total revenue. Organic cost = $2M upfront."
-            }
+            "hints_if_stuck": [
+                "Set up the equation - when does partnership cost equal going alone?",
+                "What's the total cost of partnership over 5 years?"
+            ]
         },
         {
-            "id": "q6_recommendation",
+            "id": "recommendation",
             "phase": "SYNTHESIS",
-            "prompt": "Based on everything we've discussed, what's your recommendation to the CEO? Should CloudMetrics enter Southeast Asia, and if so, how?",
-            "key_elements": ["clear recommendation", "reasoning", "phased approach", "risks", "success metrics"],
+            "description": "Synthesize into actionable recommendation",
+            "key_elements": ["clear yes/no", "reasoning", "entry mode", "phasing", "risks"],
+            "probing_angles": [
+                "So what would you tell the CEO?",
+                "Should they do this or not?",
+                "What's your recommendation?"
+            ],
             "rubric": {
-                "1": "No clear recommendation or recommendation contradicts the analysis.",
-                "2": "Has a recommendation but poorly supported or missing key considerations.",
-                "3": "Clear recommendation with basic reasoning. Mentions one or two key points.",
-                "4": "Strong: Yes/No with clear rationale, recommended entry mode, key success factors, and main risks.",
-                "5": "CEO-ready: Structured recommendation with market entry sequence, investment ask, expected returns, key milestones, and risk mitigation strategy."
+                "weak": "No clear recommendation or contradicts analysis.",
+                "adequate": "Clear recommendation with basic reasoning.",
+                "strong": "CEO-ready: structured recommendation with market entry sequence, investment ask, milestones, risk mitigation."
             },
-            "hints": {
-                "level_1": "Start with your answer: should they enter or not?",
-                "level_2": "Structure it as: recommendation, rationale, how to do it, what could go wrong."
-            }
+            "hints_if_stuck": [
+                "Start with your answer - yes or no?",
+                "Structure it as: recommendation, rationale, how, what could go wrong."
+            ]
         }
     ]
 }

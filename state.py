@@ -59,17 +59,24 @@ class InterviewState(TypedDict):
     case_title: str
     case_prompt: str
     hidden_facts: dict
-    question_sequence: List[dict]
+    exploration_areas: List[dict]  # Renamed from question_sequence
 
     # Current position
     current_phase: str
-    current_question_index: int
     difficulty_level: int  # 1-5
 
-    # Conversation
+    # Conversation tracking
     messages: List[Message]
+    areas_explored: List[str]  # Track which exploration areas have been covered
 
-    # Scoring
+    # Performance tracking
+    positive_signals: List[str]  # Things candidate is doing well
+    concerns: List[str]  # Areas of weakness observed
+
+    # Candidate state detection
+    candidate_struggling: bool  # Flag set by interviewer when genuinely stuck
+
+    # Scoring (only populated when evaluator is called)
     question_scores: List[QuestionScore]
 
     # Agent communication
