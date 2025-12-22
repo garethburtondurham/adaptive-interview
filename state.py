@@ -70,11 +70,11 @@ class InterviewState(TypedDict):
     areas_explored: List[str]  # Track which exploration areas have been covered
 
     # Performance tracking
-    positive_signals: List[str]  # Things candidate is doing well
-    concerns: List[str]  # Areas of weakness observed
-
-    # Candidate state detection
-    candidate_struggling: bool  # Flag set by interviewer when genuinely stuck
+    current_level: int  # 1-5 assessment level
+    level_name: str  # FAIL, WEAK, GOOD_NOT_ENOUGH, CLEAR_PASS, OUTSTANDING
+    level_history: List[dict]  # Track level changes over time
+    red_flags: List[str]  # Concerning patterns
+    green_flags: List[str]  # Positive signals
 
     # Scoring (only populated when evaluator is called)
     question_scores: List[QuestionScore]
@@ -90,3 +90,6 @@ class InterviewState(TypedDict):
     is_complete: bool
     final_score: Optional[float]
     final_summary: Optional[str]
+
+    # Usage tracking
+    total_tokens: int

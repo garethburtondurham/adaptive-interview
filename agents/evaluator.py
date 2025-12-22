@@ -1,6 +1,6 @@
 """
-Evaluator Agent - Assesses struggling candidates and provides guidance.
-This agent is HIDDEN from the candidate and only called when needed.
+Evaluator Agent - Assesses candidate level and provides guidance.
+Called periodically for detailed assessment.
 """
 from typing import Dict, Any
 import json
@@ -20,7 +20,7 @@ evaluator_llm = ChatAnthropic(
 
 
 def parse_evaluator_response(response_text: str) -> Dict[str, Any]:
-    """Parse the evaluator's JSON response with fallback handling."""
+    """Parse the evaluator's JSON response."""
     try:
         text = response_text
         if "```json" in text:
@@ -31,58 +31,49 @@ def parse_evaluator_response(response_text: str) -> Dict[str, Any]:
         return json.loads(text.strip())
     except json.JSONDecodeError:
         return {
-            "struggle_type": "B_REDIRECT",
-            "assessment": "Unable to parse evaluation",
-            "recommendation": "OBSERVE",
-            "suggested_prompt": None,
-            "performance_note": "Evaluation parsing failed",
-            "should_provide_data": False,
+            "current_level": 0,
+            "level_name": "PARSE_ERROR",
+            "level_justification": "Could not parse evaluation",
+            "action": "DO_NOT_HELP",
+            "interviewer_guidance": None,
+            "data_to_share": None,
+            "red_flags": [],
+            "green_flags": [],
         }
 
 
 def evaluator_node(state: InterviewState) -> Dict[str, Any]:
     """
-    Assess the struggling candidate and provide guidance to the interviewer.
-    Only called when interviewer flags genuine struggle.
+    Detailed assessment of candidate level.
     """
     # Get conversation context
-    recent_messages = state["messages"][-8:]
+    recent_messages = state["messages"][-10:]
     conversation = "\n".join([
         f"{'Interviewer' if m['role'] == 'interviewer' else 'Candidate'}: {m['content']}"
         for m in recent_messages
     ])
 
-    # Get exploration areas for context
-    areas = state.get("exploration_areas", [])
-    areas_context = "\n".join([
-        f"- {area['id']}: {area['description']} | Key elements: {', '.join(area['key_elements'])}"
-        for area in areas
-    ])
-
     system_prompt = get_evaluator_system_prompt()
 
     evaluation_context = f"""
-## Case Information
+## Case
 Title: {state["case_title"]}
-Objective: {state["case_prompt"]}
+Prompt: {state["case_prompt"]}
 
-## Current Phase
-{state.get("current_phase", "ANALYSIS")}
-
-## Conversation History
+## Full Conversation
 {conversation}
 
-## Case Structure
-{areas_context}
-
-## Hidden Facts (for your reference)
+## Hidden Facts (for reference)
 {json.dumps(state.get("hidden_facts", {}), indent=2)}
 
-## Progress So Far
-Areas explored: {', '.join(state.get("areas_explored", [])) or "None yet"}
+## Current Assessment
+Level: {state.get("current_level", 0)} ({state.get("level_name", 'NOT_ASSESSED')})
+Red Flags so far: {state.get("red_flags", [])}
+Green Flags so far: {state.get("green_flags", [])}
 
 ## Your Task
-The interviewer has flagged that the candidate is struggling. Assess the situation and provide guidance.
+Assess the candidate's current level based on the full conversation.
+Determine what action the interviewer should take next.
 """
 
     messages = [
@@ -93,17 +84,40 @@ The interviewer has flagged that the candidate is struggling. Assess the situati
     response = evaluator_llm.invoke(messages)
     evaluation = parse_evaluator_response(response.content)
 
-    # Only provide a hint if recommendation is to help
-    pending_hint = None
-    if evaluation.get("recommendation") in ["LIGHT_PROMPT", "REDIRECT"]:
-        pending_hint = evaluation.get("suggested_prompt")
+    # Track token usage
+    usage = response.response_metadata.get("usage", {})
+    tokens_used = usage.get("input_tokens", 0) + usage.get("output_tokens", 0)
+
+    # Update flags
+    red_flags = list(state.get("red_flags", []))
+    green_flags = list(state.get("green_flags", []))
+
+    for flag in evaluation.get("red_flags", []):
+        if flag not in red_flags:
+            red_flags.append(flag)
+
+    for flag in evaluation.get("green_flags", []):
+        if flag not in green_flags:
+            green_flags.append(flag)
+
+    # Determine guidance for interviewer
+    pending_guidance = None
+    action = evaluation.get("action", "DO_NOT_HELP")
+
+    if action in ["MINIMAL_HELP", "LIGHT_HELP"]:
+        pending_guidance = evaluation.get("interviewer_guidance")
 
     return {
-        "pending_hint": pending_hint,
+        "current_level": evaluation.get("current_level", state.get("current_level", 0)),
+        "level_name": evaluation.get("level_name", state.get("level_name", "NOT_ASSESSED")),
+        "red_flags": red_flags,
+        "green_flags": green_flags,
+        "pending_guidance": pending_guidance,
         "last_evaluator_output": {
-            "struggle_type": evaluation.get("struggle_type"),
-            "assessment": evaluation.get("assessment"),
-            "recommendation": evaluation.get("recommendation"),
-            "performance_note": evaluation.get("performance_note"),
+            "level": evaluation.get("current_level"),
+            "justification": evaluation.get("level_justification"),
+            "action": action,
+            "data_to_share": evaluation.get("data_to_share"),
         },
+        "total_tokens": state.get("total_tokens", 0) + tokens_used,
     }

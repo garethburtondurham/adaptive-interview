@@ -1,138 +1,153 @@
 {
     "title": "Coffee Shop Profitability",
-    "candidate_prompt": "Our client is BeanScene, a national coffee shop chain with 500 locations. Revenue has grown 5% year-over-year, but profits have dropped by 20% in the last 12 months. The CEO wants to know why profits are declining and what to do about it.",
+    "candidate_prompt": "BeanScene is a national coffee chain with 500 locations. Revenue is up 5% YoY, but profits are down 20%. The CEO wants to understand why and what to do.",
     "case_objectives": [
-        "Identify root cause of profit decline despite revenue growth",
-        "Analyze cost structure and identify key drivers",
-        "Develop actionable recommendations"
+        "Diagnose root cause of profit decline despite revenue growth",
+        "Demonstrate structured, hypothesis-driven thinking",
+        "Provide prioritized, commercially-sound recommendations"
     ],
-    "hidden_facts": {
-        "business_model": {
-            "revenue_split": {"coffee": 0.70, "food": 0.30},
-            "store_count": 500,
-            "avg_transaction": 8.50,
-            "daily_transactions_per_store": 400
+    "grading_rubric": {
+        "level_1": {
+            "name": "Fail",
+            "description": "Unstructured & Superficial",
+            "indicators": [
+                "No structured diagnosis",
+                "Jumps straight to generic solutions (cut costs, raise prices)",
+                "No clarifying questions asked",
+                "No breakdown of P&L or profit equation",
+                "Mentions vague factors like 'inflation' without analysis",
+                "No prioritization or evidence-based thinking"
+            ],
+            "example": "Profits are down because costs are probably higher, like rent and wages. They should increase prices or cut staff.",
+            "action": "DO_NOT_HELP"
         },
-        "revenue_changes": {
-            "coffee_volume": "+10%",
-            "coffee_price": "0% (no change)",
-            "food_volume": "0% (flat)",
-            "food_price": "0% (no change)",
-            "total_revenue_growth": "+5%"
+        "level_2": {
+            "name": "Weak / Low Pass",
+            "description": "Structure Without Insight",
+            "indicators": [
+                "Basic revenue vs costs framing",
+                "Correctly notes costs must be the issue",
+                "Lists possible cost drivers but treats all equally",
+                "No hypothesis formed before asking for data",
+                "Generic recommendations without prioritization",
+                "Asks for data but doesn't know what to do with it"
+            ],
+            "example": "Let me break this into revenue and costs. Revenue is up so it must be costs. Could be labour, rent, beans, utilities. Can I see the cost breakdown?",
+            "action": "MINIMAL_HELP"
         },
-        "cost_changes": {
-            "fixed_costs_rent": "0% (flat)",
-            "fixed_costs_labor": "+3% (slight increase)",
-            "variable_costs_beans": "+40% (Brazil drought)",
-            "variable_costs_cups_packaging": "+15%",
-            "variable_costs_food_ingredients": "+5%"
+        "level_3": {
+            "name": "Good But Not Enough",
+            "description": "Solid but Non-Distinctive",
+            "indicators": [
+                "Clean profit equation structure",
+                "Forms hypothesis about margin pressure",
+                "Asks whether growth is price or volume led",
+                "Identifies primary cost drivers with data",
+                "Mix of reasonable recommendations",
+                "Lacks sharp prioritization and conviction"
+            ],
+            "example": "Profit = Revenue - Costs. Revenue up 5% but profit down 20% suggests margin compression. I'd want to know if revenue growth is price or volume, and which costs increased most.",
+            "action": "LIGHT_HELP_IF_STUCK"
         },
-        "market_context": {
-            "competitor_pricing": "Similar to BeanScene",
-            "customer_segments": "60% commuters, 30% remote workers, 10% students",
-            "price_sensitivity": "Moderate - premium positioning"
+        "level_4": {
+            "name": "Clear Pass",
+            "description": "Strong, Structured, Commercial",
+            "indicators": [
+                "Clarifies objective upfront",
+                "Hypothesizes revenue masking margin erosion",
+                "Segments analysis (same-store vs new, fixed vs variable, product mix)",
+                "Identifies specific drivers with quantification",
+                "Prioritized recommendations with clear logic",
+                "Addresses risks and next steps",
+                "CEO-ready synthesis"
+            ],
+            "example": "The objective is to restore profit sustainably. Revenue up but profit down sharply suggests margin erosion. I'd segment by same-store vs new-store, and fixed vs variable costs to isolate the driver.",
+            "action": "CHALLENGE_AND_EXTEND"
+        },
+        "level_5": {
+            "name": "Outstanding",
+            "description": "Top-Tier / Bain-Level",
+            "indicators": [
+                "Reframes problem strategically (e.g., 'destroying value while growing')",
+                "Focuses on unit economics per store",
+                "Quantifies impact of each driver",
+                "Identifies root cause with conviction (e.g., '80% from labour and mix')",
+                "Bold, specific recommendations",
+                "90-day action plan or similar specificity",
+                "Thinks like an owner"
+            ],
+            "example": "This is a return-on-growth question - we're growing revenue but destroying value. Let me look at unit economics per store to find where value is leaking.",
+            "action": "LET_THEM_SHINE"
         }
+    },
+    "hidden_facts": {
+        "revenue_analysis": {
+            "same_store_traffic": "Flat (0% growth)",
+            "revenue_growth_source": "Price increases (5%) not volume",
+            "food_attachment_rate": "Up 15% (but lower margin)",
+            "promotional_sales": "Up 20% (discounted)"
+        },
+        "cost_analysis": {
+            "labour_cost_change": "+18% (wage inflation + scheduling inefficiency)",
+            "labour_cost_per_transaction": "Up 12% due to menu complexity",
+            "coffee_bean_costs": "+8% (commodity pressure)",
+            "rent": "Flat",
+            "food_ingredient_costs": "+5%"
+        },
+        "store_performance": {
+            "bottom_quartile_stores": "Deeply unprofitable (negative EBITDA)",
+            "new_store_cannibalization": "15% of new stores cannibalizing existing locations",
+            "store_level_variance": "Top quartile 3x more profitable than average"
+        },
+        "margin_analysis": {
+            "coffee_margin": "70% (down from 75%)",
+            "food_margin": "35% (always lower)",
+            "blended_margin_trend": "Declining due to mix shift to food"
+        },
+        "root_cause_summary": "80% of profit decline from labour inefficiency and low-margin product mix, not commodity costs"
     },
     "exploration_areas": [
         {
-            "id": "initial_thinking",
+            "id": "problem_framing",
             "phase": "STRUCTURING",
-            "description": "Understand how candidate initially thinks about the problem",
-            "key_elements": ["profit equation", "revenue vs cost focus", "hypothesis generation"],
-            "probing_angles": [
-                "What are your initial thoughts?",
-                "What jumps out to you about this situation?",
-                "What would you want to understand first?"
-            ],
-            "rubric": {
-                "weak": "Jumps to random solutions without analysis. Misses that revenue is growing.",
-                "adequate": "Recognizes need to look at both revenue and costs. Basic structure.",
-                "strong": "Quickly identifies that growing revenue + falling profit = cost problem. Forms clear hypothesis."
-            },
-            "hints_if_stuck": [
-                "What's interesting about the relationship between revenue and profit here?",
-                "If revenue is going up, what must be happening for profit to go down?"
-            ]
+            "description": "How candidate frames and structures the problem",
+            "what_good_looks_like": "Profit equation, hypothesis that costs are issue, segments for analysis",
+            "what_bad_looks_like": "No structure, jumps to solutions, treats all factors equally"
+        },
+        {
+            "id": "hypothesis_formation",
+            "phase": "STRUCTURING",
+            "description": "Whether candidate forms hypotheses before diving into data",
+            "what_good_looks_like": "Clear hypothesis about margin erosion, asks targeted questions",
+            "what_bad_looks_like": "Asks for all data without knowing what to test"
         },
         {
             "id": "cost_analysis",
             "phase": "ANALYSIS",
-            "description": "Explore the cost structure of a coffee shop",
-            "key_elements": ["COGS/ingredients", "labor", "rent", "fixed vs variable distinction", "coffee beans"],
-            "probing_angles": [
-                "What costs would a coffee shop chain like this have?",
-                "Which of those might change when you sell more coffee?",
-                "What's the biggest cost for a coffee shop?"
-            ],
-            "rubric": {
-                "weak": "Cannot identify relevant cost categories.",
-                "adequate": "Lists main categories: ingredients, labor, rent. Basic prioritization.",
-                "strong": "Distinguishes fixed vs variable. Notes coffee beans are commodity and volatile. Prioritizes variable costs given volume increase."
-            },
-            "hints_if_stuck": [
-                "Think about what you'd need to make and serve a cup of coffee.",
-                "Some costs change with volume, some don't - which is which here?"
-            ]
+            "description": "How candidate analyzes cost drivers",
+            "what_good_looks_like": "Segments fixed/variable, identifies labour as key driver, quantifies impact",
+            "what_bad_looks_like": "Lists costs without prioritization, focuses on wrong drivers"
         },
         {
-            "id": "quantitative_analysis",
-            "phase": "CALCULATION",
-            "description": "Work through the math of the cost impact",
-            "data_to_share": "Coffee bean costs are up 40% due to a Brazil drought. Coffee is 70% of revenue, and beans are typically 30% of coffee revenue.",
-            "key_elements": ["percentage calculation", "cost impact quantification", "margin math"],
-            "probing_angles": [
-                "Can you walk me through what that means for their costs?",
-                "How significant is that impact?",
-                "Does that explain the profit decline?"
-            ],
-            "rubric": {
-                "weak": "Cannot attempt the calculation or fundamental errors.",
-                "adequate": "Sets up calculation correctly, minor errors. Gets approximately right answer.",
-                "strong": "Clean calculation: 70% x 30% = 21% of revenue is beans. 40% increase = 8.4pp additional cost. Relates back to profit decline."
-            },
-            "hints_if_stuck": [
-                "Let's break it down - what percentage of total revenue goes to coffee beans?",
-                "Start with the 70% and 30% - how do those combine?"
-            ]
+            "id": "revenue_quality",
+            "phase": "ANALYSIS",
+            "description": "Understanding that revenue growth quality matters",
+            "what_good_looks_like": "Asks if growth is price/volume led, identifies mix shift issue",
+            "what_bad_looks_like": "Assumes revenue is fine because it's growing"
         },
         {
             "id": "recommendations",
             "phase": "SYNTHESIS",
-            "description": "Develop recommendations to address the problem",
-            "key_elements": ["price increase", "cost reduction", "supplier negotiation", "menu optimization", "trade-offs"],
-            "probing_angles": [
-                "What should BeanScene do about this?",
-                "What are the options here?",
-                "What would you recommend and why?"
-            ],
-            "rubric": {
-                "weak": "Vague recommendations without connection to analysis.",
-                "adequate": "Reasonable recommendations: raise prices, find new suppliers. Basic reasoning.",
-                "strong": "Strategic recommendations with trade-offs: considers customer segments, competitive dynamics, implementation approach."
-            },
-            "hints_if_stuck": [
-                "Think about the main levers they have - what can they control?",
-                "If costs went up, what are their options?"
-            ]
+            "description": "Quality and prioritization of recommendations",
+            "what_good_looks_like": "Prioritized by impact, specific actions, addresses risks",
+            "what_bad_looks_like": "Generic (cut costs, raise prices), no prioritization"
         },
         {
-            "id": "ceo_summary",
+            "id": "synthesis",
             "phase": "SYNTHESIS",
-            "description": "Synthesize findings into executive summary",
-            "key_elements": ["clear recommendation", "supporting reasoning", "risks", "next steps"],
-            "probing_angles": [
-                "If you had 30 seconds with the CEO, what would you tell her?",
-                "What's the bottom line here?"
-            ],
-            "rubric": {
-                "weak": "Rambling, no clear recommendation, or doesn't follow from analysis.",
-                "adequate": "Clear recommendation with basic reasoning. Missing risks or next steps.",
-                "strong": "CEO-ready: Clear recommendation, quantified impact, risk mitigation, immediate next steps."
-            },
-            "hints_if_stuck": [
-                "Start with your bottom line - what should they do?",
-                "Think: recommendation, why, what could go wrong."
-            ]
+            "description": "CEO-ready synthesis and conviction",
+            "what_good_looks_like": "Clear answer, quantified impact, action plan",
+            "what_bad_looks_like": "Wishy-washy, no clear recommendation"
         }
     ]
 }

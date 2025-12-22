@@ -41,9 +41,11 @@ def initialize_interview_state(
         difficulty_level=3,  # Start at medium
         messages=[],
         areas_explored=[],
-        positive_signals=[],
-        concerns=[],
-        candidate_struggling=False,
+        current_level=0,  # Not yet assessed
+        level_name="NOT_ASSESSED",
+        level_history=[],
+        red_flags=[],
+        green_flags=[],
         question_scores=[],
         last_evaluator_output=None,
         next_directive=None,
@@ -53,6 +55,7 @@ def initialize_interview_state(
         is_complete=False,
         final_score=None,
         final_summary=None,
+        total_tokens=0,
     )
 
 

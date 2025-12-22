@@ -11,12 +11,12 @@ from langchain_core.messages import SystemMessage, HumanMessage
 
 from state import InterviewState, Message
 from case_loader import get_exploration_areas, get_unexplored_areas
-from prompts.interviewer_prompt import get_interviewer_system_prompt, get_opening_system_prompt
+from prompts.interviewer_prompt import get_interviewer_system_prompt
 
-# Initialize LLM (slightly higher temperature for natural conversation)
+# Initialize LLM
 interviewer_llm = ChatAnthropic(
     model="claude-sonnet-4-20250514",
-    temperature=0.4,
+    temperature=0.3,
     max_tokens=1024,
 )
 
@@ -24,7 +24,6 @@ interviewer_llm = ChatAnthropic(
 def parse_interviewer_response(response_text: str) -> Dict[str, Any]:
     """Parse the interviewer's JSON response with fallback handling."""
     try:
-        # Extract JSON from response (handle markdown code blocks)
         text = response_text
         if "```json" in text:
             text = text.split("```json")[1].split("```")[0]
@@ -33,11 +32,13 @@ def parse_interviewer_response(response_text: str) -> Dict[str, Any]:
 
         return json.loads(text.strip())
     except json.JSONDecodeError:
-        # Fallback if parsing fails - treat as plain message
         return {
             "message": response_text,
-            "candidate_struggling": False,
-            "performance_signals": {"positive": [], "concerns": []},
+            "internal_assessment": {
+                "current_level": 0,
+                "level_trend": "STABLE",
+                "key_observation": "Could not parse assessment"
+            },
             "areas_touched": [],
             "current_phase": "ANALYSIS",
         }
@@ -46,7 +47,6 @@ def parse_interviewer_response(response_text: str) -> Dict[str, Any]:
 def interviewer_node(state: InterviewState) -> Dict[str, Any]:
     """
     Generate the interviewer's response to the candidate.
-    This is the ONLY agent the candidate interacts with.
     """
     # Check if interview is complete
     if state.get("is_complete"):
@@ -59,62 +59,56 @@ def interviewer_node(state: InterviewState) -> Dict[str, Any]:
     # Build context for the interviewer
     system_prompt = get_interviewer_system_prompt()
 
-    # Get recent conversation for context (last 8 messages)
-    recent_messages = state["messages"][-8:]
-    conversation_history = "\n".join(
-        [
-            f"{'Interviewer' if m['role'] == 'interviewer' else 'Candidate'}: {m['content']}"
-            for m in recent_messages
-        ]
-    )
+    # Get recent conversation
+    recent_messages = state["messages"][-10:]
+    conversation_history = "\n".join([
+        f"{'Interviewer' if m['role'] == 'interviewer' else 'Candidate'}: {m['content']}"
+        for m in recent_messages
+    ])
 
-    # Get exploration areas for context
+    # Get case grading rubric if available
+    grading_context = ""
+    case_data = state.get("exploration_areas", [])
+
+    # Get all exploration areas
     all_areas = get_exploration_areas(state)
-    unexplored = get_unexplored_areas(state)
-
     areas_summary = "\n".join([
-        f"- {area['id']}: {area['description']} (key elements: {', '.join(area['key_elements'])})"
+        f"- {area['id']}: {area['description']}"
         for area in all_areas
     ])
 
-    unexplored_summary = "\n".join([
-        f"- {area['id']}: {area['description']}"
-        for area in unexplored
-    ]) if unexplored else "All areas have been explored"
-
-    # Include hint if evaluator provided one (candidate was struggling)
-    hint_context = ""
-    if state.get("pending_hint"):
-        hint_context = f"""
-## Hint to Weave In (candidate was struggling)
-Use this hint naturally in your response: {state.get("pending_hint")}
-"""
+    # Current assessment context
+    current_level = state.get("current_level", 0)
+    level_name = state.get("level_name", "NOT_ASSESSED")
 
     context = f"""
-## Case Information
+## Case
 Title: {state["case_title"]}
-Scenario: {state["case_prompt"]}
+Prompt: {state["case_prompt"]}
 
-## Conversation So Far
+## Current Assessment
+Level: {current_level} ({level_name})
+Red Flags: {state.get("red_flags", [])}
+Green Flags: {state.get("green_flags", [])}
+
+## Conversation
 {conversation_history}
 
-## Exploration Areas for This Case
+## Exploration Areas
 {areas_summary}
 
-## Areas Not Yet Explored
-{unexplored_summary}
-
-## Areas Already Covered
+## Areas Covered
 {', '.join(state.get("areas_explored", [])) or "None yet"}
 
-## Key Elements Candidate Has Demonstrated
-{', '.join(state.get("key_elements_detected", [])) or "None yet"}
+## Hidden Facts (share ONLY when earned with hypothesis)
+{json.dumps(state.get("hidden_facts", {}), indent=2)}
 
-## Hidden Case Facts (share when relevant)
-{json.dumps(state["hidden_facts"], indent=2)}
-{hint_context}
+## Evaluator Guidance (if any)
+{state.get("pending_guidance", "None")}
+
 ## Your Task
-Respond naturally to the candidate's last message. Continue the conversation, probe their thinking, and guide them through the case. Remember to output valid JSON with your response.
+Respond to the candidate's last message. Assess their level and adjust your behavior accordingly.
+Remember: DO NOT rescue Level 1-2 candidates. Only help Level 3+ on execution, not thinking.
 """
 
     messages = [
@@ -124,6 +118,10 @@ Respond naturally to the candidate's last message. Continue the conversation, pr
 
     response = interviewer_llm.invoke(messages)
     parsed = parse_interviewer_response(response.content)
+
+    # Track token usage
+    usage = response.response_metadata.get("usage", {})
+    tokens_used = usage.get("input_tokens", 0) + usage.get("output_tokens", 0)
 
     new_message = Message(
         role="interviewer",
@@ -137,41 +135,48 @@ Respond naturally to the candidate's last message. Continue the conversation, pr
         if area not in current_areas:
             current_areas.append(area)
 
-    # Track performance signals
-    signals = parsed.get("performance_signals", {})
-    positive_signals = list(state.get("positive_signals", []))
-    concerns = list(state.get("concerns", []))
+    # Extract assessment
+    assessment = parsed.get("internal_assessment", {})
+    new_level = assessment.get("current_level", state.get("current_level", 0))
 
-    for signal in signals.get("positive", []):
-        if signal not in positive_signals:
-            positive_signals.append(signal)
-    for concern in signals.get("concerns", []):
-        if concern not in concerns:
-            concerns.append(concern)
+    # Map level number to name
+    level_names = {
+        1: "FAIL",
+        2: "WEAK",
+        3: "GOOD_NOT_ENOUGH",
+        4: "CLEAR_PASS",
+        5: "OUTSTANDING"
+    }
+    new_level_name = level_names.get(new_level, "NOT_ASSESSED")
 
-    # Determine phase
+    # Track level history
+    level_history = list(state.get("level_history", []))
+    if new_level > 0:
+        level_history.append({
+            "level": new_level,
+            "observation": assessment.get("key_observation", ""),
+            "timestamp": datetime.utcnow().isoformat()
+        })
+
     new_phase = parsed.get("current_phase", state.get("current_phase", "ANALYSIS"))
 
     return {
         "messages": state["messages"] + [new_message],
-        "candidate_struggling": parsed.get("candidate_struggling", False),
         "areas_explored": current_areas,
-        "positive_signals": positive_signals,
-        "concerns": concerns,
+        "current_level": new_level,
+        "level_name": new_level_name,
+        "level_history": level_history,
         "current_phase": new_phase,
-        "pending_hint": None,  # Clear after using
-        "pending_complexity": None,
-        "pending_data_reveal": None,
+        "pending_guidance": None,
+        "total_tokens": state.get("total_tokens", 0) + tokens_used,
     }
 
 
 def generate_opening_message(state: InterviewState) -> Dict[str, Any]:
     """Generate the initial case presentation."""
-    opening = f"""Welcome! I'm looking forward to working through a case with you today.
+    opening = f"""{state["case_prompt"]}
 
-Here's the situation: {state["case_prompt"]}
-
-Take a moment to think about this. What are your initial thoughts?"""
+Over to you."""
 
     new_message = Message(
         role="interviewer",
@@ -182,28 +187,15 @@ Take a moment to think about this. What are your initial thoughts?"""
     return {
         "messages": [new_message],
         "current_phase": "STRUCTURING",
-        "candidate_struggling": False,
     }
 
 
 def generate_closing_message(state: InterviewState) -> Dict[str, Any]:
     """Generate the interview closing."""
-    # Assess overall performance based on signals
-    positives = len(state.get("positive_signals", []))
-    concerns = len(state.get("concerns", []))
-    areas_covered = len(state.get("areas_explored", []))
+    current_level = state.get("current_level", 0)
+    level_name = state.get("level_name", "NOT_ASSESSED")
 
-    # Simple heuristic: more positives than concerns is good
-    if positives > concerns and areas_covered >= 2:
-        score = min(5, 3 + (positives - concerns) * 0.5)
-    elif positives == concerns:
-        score = 3.0
-    else:
-        score = max(1, 3 - (concerns - positives) * 0.5)
-
-    closing = """That's a good place to wrap up. Thank you for working through this case with me.
-
-We'll be in touch with next steps soon."""
+    closing = """That's a good place to wrap up. Thank you for working through this case with me."""
 
     new_message = Message(
         role="interviewer",
@@ -214,6 +206,6 @@ We'll be in touch with next steps soon."""
     return {
         "messages": state["messages"] + [new_message],
         "is_complete": True,
-        "final_score": round(score, 2),
+        "final_score": current_level,
         "current_phase": "COMPLETE",
     }
