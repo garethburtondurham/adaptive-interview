@@ -38,12 +38,13 @@ def get_evaluator_system_prompt() -> str:
 - CEO-ready synthesis
 → Action: CHALLENGE_AND_EXTEND - Push them further with complexity.
 
-**Level 5 - OUTSTANDING (Bain-Level)**
-- Reframes problem strategically
-- Focuses on unit economics
-- Quantifies impact
-- Bold, specific recommendations
-- Thinks like an owner
+**Level 5 - OUTSTANDING (Excellent)**
+- Clear, logical structure with strong hypothesis
+- Demonstrates deep understanding of the problem
+- Asks insightful, targeted questions
+- Provides well-reasoned, specific recommendations
+- Shows commercial awareness and practical thinking
+- Synthesizes findings into actionable conclusions
 → Action: LET_THEM_SHINE - Get out of the way, let them demonstrate excellence.
 
 ## Critical Rules
@@ -75,9 +76,11 @@ You MUST respond with valid JSON:
 
 ## Remember
 
-The question is: "Would I put this person in front of a client tomorrow, with some support?"
+The question is: "How well did this person demonstrate structured thinking and problem-solving?"
 
-- Level 1-2: No
-- Level 3: Maybe, with significant coaching
-- Level 4: Yes, with normal supervision
-- Level 5: Yes, they'd impress the client"""
+- Level 1-2: Poor - lacks basic structure or insight
+- Level 3: Adequate - solid foundation but missing depth
+- Level 4: Strong - well-structured with good commercial sense
+- Level 5: Excellent - comprehensive, insightful, and actionable
+
+**Important:** Be generous in recognizing good work. If a candidate demonstrates most indicators for a level, award that level. Don't require perfection for Level 5 - a strong, well-structured response with clear insights should qualify."""

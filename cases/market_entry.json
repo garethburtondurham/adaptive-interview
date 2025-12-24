@@ -6,6 +6,79 @@
         "Assess company's right to win in this market",
         "Recommend entry strategy if appropriate"
     ],
+    "grading_rubric": {
+        "level_1": {
+            "name": "Fail",
+            "description": "Unstructured & Superficial",
+            "indicators": [
+                "No clear framework for evaluating market entry",
+                "Jumps to conclusion without analysis (e.g., 'Yes, they should expand')",
+                "No consideration of market attractiveness or company fit",
+                "Cannot identify relevant factors for the decision",
+                "Generic statements without context (e.g., 'Asia is growing')",
+                "No understanding of B2B SaaS dynamics"
+            ],
+            "example": "Southeast Asia is a big market and growing fast, so they should definitely enter. They could open an office there.",
+            "action": "DO_NOT_HELP"
+        },
+        "level_2": {
+            "name": "Weak / Low Pass",
+            "description": "Structure Without Insight",
+            "indicators": [
+                "Basic market vs company framing",
+                "Lists generic factors (market size, competition) without prioritization",
+                "No hypothesis about whether entry makes sense",
+                "Asks for data without knowing what to test",
+                "Considers only one entry mode",
+                "Recommendations lack specificity"
+            ],
+            "example": "I'd look at market size, competition, and whether they have the resources. Can I see data on the market? They could either go alone or partner.",
+            "action": "MINIMAL_HELP"
+        },
+        "level_3": {
+            "name": "Good But Not Enough",
+            "description": "Solid but Non-Distinctive",
+            "indicators": [
+                "Clear framework: market attractiveness + right to win",
+                "Identifies relevant factors specific to B2B SaaS",
+                "Asks reasonable questions about TAM, competition, challenges",
+                "Compares entry modes with basic trade-offs",
+                "Provides recommendation but lacks conviction or detail",
+                "Limited consideration of risks or implementation"
+            ],
+            "example": "I'd structure this as: Is the market attractive? Can they win? How should they enter? The market seems attractive at $2B growing 25%. I'd want to understand competition and their capabilities.",
+            "action": "LIGHT_HELP_IF_STUCK"
+        },
+        "level_4": {
+            "name": "Clear Pass",
+            "description": "Strong, Structured, Commercial",
+            "indicators": [
+                "Comprehensive framework with clear decision criteria",
+                "Identifies key challenges specific to SEA (localization, payments, data residency)",
+                "Evaluates multiple entry modes with clear trade-offs",
+                "Shows understanding of B2B SaaS economics (CAC, LTV, payback)",
+                "Prioritized recommendation with supporting logic",
+                "Considers phasing, risks, and success metrics"
+            ],
+            "example": "Market entry decisions require: market attractiveness, right to win, and entry mode analysis. Given $2B TAM at 25% growth with low competition, the market is attractive. Key question is their ability to localize and sell relationship-driven deals.",
+            "action": "CHALLENGE_AND_EXTEND"
+        },
+        "level_5": {
+            "name": "Outstanding",
+            "description": "Excellent Performance",
+            "indicators": [
+                "Clear, logical decision framework tailored to context",
+                "Strong hypothesis about market fit and entry approach",
+                "Identifies nuanced challenges (country variation, local payments, data sovereignty)",
+                "Compares entry modes with quantitative reasoning",
+                "Recommends specific beachhead market with rationale",
+                "Actionable recommendation with milestones and risk mitigation",
+                "Demonstrates commercial awareness of SaaS metrics"
+            ],
+            "example": "This is a classic 'where to play, how to win' question. My hypothesis is the market is attractive but execution risk is high. I'd evaluate: market (TAM/SAM by country), capability gaps (localization, sales model), and entry economics. Singapore as beachhead makes sense given enterprise concentration.",
+            "action": "LET_THEM_SHINE"
+        }
+    },
     "hidden_facts": {
         "company_info": {
             "annual_revenue": "$50M",
@@ -36,125 +109,46 @@
     },
     "exploration_areas": [
         {
-            "id": "initial_thinking",
+            "id": "problem_framing",
             "phase": "STRUCTURING",
-            "description": "Understand how candidate thinks about market entry decisions",
-            "key_elements": ["market attractiveness", "company capability", "go/no-go criteria"],
-            "probing_angles": [
-                "What's your initial take on this?",
-                "What would you need to know to advise the CEO?",
-                "How do you think about market entry decisions?"
-            ],
-            "rubric": {
-                "weak": "No clear approach. Random list of considerations.",
-                "adequate": "Recognizes need to evaluate market and company fit.",
-                "strong": "Clear decision framework: market attractiveness, right to win, entry mode, financials."
-            },
-            "hints_if_stuck": [
-                "What would make you say yes versus no to this opportunity?",
-                "Think about what you'd need to believe for this to be a good idea."
-            ]
+            "description": "How candidate frames and structures the market entry decision",
+            "what_good_looks_like": "Clear framework with market attractiveness, right to win, entry mode analysis; forms hypothesis about key decision factors",
+            "what_bad_looks_like": "No framework, jumps to yes/no without structure, lists random considerations"
+        },
+        {
+            "id": "hypothesis_formation",
+            "phase": "STRUCTURING",
+            "description": "Whether candidate forms hypotheses before diving into data",
+            "what_good_looks_like": "Clear hypothesis about market fit, asks targeted questions to test assumptions",
+            "what_bad_looks_like": "Asks for all data without knowing what to test, no clear thesis"
         },
         {
             "id": "market_analysis",
             "phase": "ANALYSIS",
-            "description": "Evaluate the Southeast Asian market opportunity",
-            "key_elements": ["market size", "growth rate", "customer segments", "competitive landscape"],
-            "probing_angles": [
-                "What would you want to know about the market?",
-                "What makes a market attractive for a B2B SaaS company?",
-                "The market is $2B growing 25% annually - what do you make of that?"
-            ],
-            "rubric": {
-                "weak": "Generic questions not specific to B2B software or region.",
-                "adequate": "Asks about TAM, growth, competition. Reasonable coverage.",
-                "strong": "Sophisticated: TAM/SAM/SOM, growth drivers, adoption curve, competitive positioning."
-            },
-            "hints_if_stuck": [
-                "What makes a market attractive for a software company specifically?",
-                "Think about size, growth, and who else is competing."
-            ]
+            "description": "How candidate evaluates the Southeast Asian market opportunity",
+            "what_good_looks_like": "Considers TAM/SAM/SOM, growth drivers, adoption curve, competitive dynamics; segments by country",
+            "what_bad_looks_like": "Generic questions not specific to B2B SaaS or region, no understanding of market attractiveness"
         },
         {
-            "id": "challenges",
+            "id": "challenges_assessment",
             "phase": "ANALYSIS",
-            "description": "Identify challenges of entering Southeast Asia",
-            "key_elements": ["localization", "payment methods", "data residency", "sales model", "cultural differences"],
-            "probing_angles": [
-                "What challenges might they face entering this region?",
-                "What's different about doing business in Southeast Asia versus the US?",
-                "What could go wrong?"
-            ],
-            "rubric": {
-                "weak": "Cannot identify meaningful challenges specific to context.",
-                "adequate": "Identifies 2-3 relevant challenges: localization, local competition, buyer behavior.",
-                "strong": "Comprehensive and prioritized: language, payments, data sovereignty, relationship selling, country variation."
-            },
-            "hints_if_stuck": [
-                "Think about product, sales, and operations - what's different?",
-                "What would a US software company need to adapt?"
-            ]
+            "description": "Identifying challenges specific to Southeast Asia market entry",
+            "what_good_looks_like": "Comprehensive coverage of localization, payments, data sovereignty, relationship selling; prioritizes challenges with mitigation ideas",
+            "what_bad_looks_like": "Cannot identify meaningful challenges, generic 'it's risky' without specifics"
         },
         {
-            "id": "entry_modes",
+            "id": "entry_mode_analysis",
             "phase": "ANALYSIS",
-            "description": "Evaluate different ways to enter the market",
-            "key_elements": ["organic vs partner vs acquire", "beachhead strategy", "phasing", "trade-offs"],
-            "probing_angles": [
-                "How could they enter this market?",
-                "What are the trade-offs between different approaches?",
-                "Would you go alone or with a partner?"
-            ],
-            "rubric": {
-                "weak": "Only considers one option without alternatives.",
-                "adequate": "Compares 2-3 options with basic trade-offs.",
-                "strong": "Strategic: recommends beachhead market, considers phasing, identifies success metrics."
-            },
-            "hints_if_stuck": [
-                "What are the typical ways companies enter new markets?",
-                "Think about build, buy, or partner."
-            ]
+            "description": "Evaluating different ways to enter the market",
+            "what_good_looks_like": "Evaluates build/buy/partner options with clear criteria, considers phasing and beachhead strategy, quantitative comparison",
+            "what_bad_looks_like": "Only considers one option without alternatives or trade-offs, no understanding of entry modes"
         },
         {
-            "id": "financials",
-            "phase": "CALCULATION",
-            "description": "Analyze the financial trade-offs",
-            "data_to_share": "Organic expansion costs $2M in year one with expected revenue of $500K. Partnership costs nothing upfront but gives away 15% of revenue.",
-            "key_elements": ["break-even analysis", "NPV thinking", "risk-adjusted returns"],
-            "probing_angles": [
-                "How would you compare these options financially?",
-                "At what point does one become better than the other?",
-                "Walk me through the math."
-            ],
-            "rubric": {
-                "weak": "Cannot set up the comparison.",
-                "adequate": "Sets up correctly, gets approximate break-even.",
-                "strong": "Correct math plus considers time value, upside potential, risk-adjusted returns."
-            },
-            "hints_if_stuck": [
-                "Set up the equation - when does partnership cost equal going alone?",
-                "What's the total cost of partnership over 5 years?"
-            ]
-        },
-        {
-            "id": "recommendation",
+            "id": "recommendations",
             "phase": "SYNTHESIS",
-            "description": "Synthesize into actionable recommendation",
-            "key_elements": ["clear yes/no", "reasoning", "entry mode", "phasing", "risks"],
-            "probing_angles": [
-                "So what would you tell the CEO?",
-                "Should they do this or not?",
-                "What's your recommendation?"
-            ],
-            "rubric": {
-                "weak": "No clear recommendation or contradicts analysis.",
-                "adequate": "Clear recommendation with basic reasoning.",
-                "strong": "CEO-ready: structured recommendation with market entry sequence, investment ask, milestones, risk mitigation."
-            },
-            "hints_if_stuck": [
-                "Start with your answer - yes or no?",
-                "Structure it as: recommendation, rationale, how, what could go wrong."
-            ]
+            "description": "Quality and prioritization of final recommendation",
+            "what_good_looks_like": "CEO-ready recommendation with market entry sequence, investment ask, milestones, risk mitigation",
+            "what_bad_looks_like": "No clear recommendation, contradicts analysis, wishy-washy answer"
         }
     ]
 }

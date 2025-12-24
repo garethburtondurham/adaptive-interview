@@ -66,17 +66,17 @@
         },
         "level_5": {
             "name": "Outstanding",
-            "description": "Top-Tier / Bain-Level",
+            "description": "Excellent Performance",
             "indicators": [
-                "Reframes problem strategically (e.g., 'destroying value while growing')",
-                "Focuses on unit economics per store",
-                "Quantifies impact of each driver",
-                "Identifies root cause with conviction (e.g., '80% from labour and mix')",
-                "Bold, specific recommendations",
-                "90-day action plan or similar specificity",
-                "Thinks like an owner"
+                "Clear, logical framework for analyzing the problem",
+                "Strong hypothesis about margin pressure or cost drivers",
+                "Asks targeted, insightful questions to test hypotheses",
+                "Identifies key drivers with reasoning (e.g., labour costs, product mix)",
+                "Specific, prioritized recommendations",
+                "Considers implementation or next steps",
+                "Demonstrates commercial awareness"
             ],
-            "example": "This is a return-on-growth question - we're growing revenue but destroying value. Let me look at unit economics per store to find where value is leaking.",
+            "example": "Profit declining while revenue grows suggests margin compression. Let me structure this as revenue quality vs cost drivers. My hypothesis is variable costs are outpacing revenue growth - I'd want to see the cost breakdown by category.",
             "action": "LET_THEM_SHINE"
         }
     },

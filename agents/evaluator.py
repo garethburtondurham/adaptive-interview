@@ -14,7 +14,7 @@ from prompts.evaluator_prompt import get_evaluator_system_prompt
 # Initialize LLM
 evaluator_llm = ChatAnthropic(
     model="claude-sonnet-4-20250514",
-    temperature=0.1,
+    temperature=0.3,  # Slightly higher for more balanced scoring
     max_tokens=1024,
 )
 
