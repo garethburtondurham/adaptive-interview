@@ -14,7 +14,7 @@ from prompts.evaluator_prompt import get_evaluator_system_prompt
 # Initialize LLM
 evaluator_llm = ChatAnthropic(
     model="claude-sonnet-4-20250514",
-    temperature=0.3,  # Slightly higher for more balanced scoring
+    temperature=0.3,
     max_tokens=1024,
 )
 
@@ -58,18 +58,21 @@ def evaluator_node(state: InterviewState) -> Dict[str, Any]:
     evaluation_context = f"""
 ## Case
 Title: {state["case_title"]}
-Prompt: {state["case_prompt"]}
+Opening: {state["opening"]}
 
 ## Full Conversation
 {conversation}
 
-## Hidden Facts (for reference)
-{json.dumps(state.get("hidden_facts", {}), indent=2)}
+## Facts (for reference)
+{json.dumps(state.get("facts", {}), indent=2)}
+
+## Root Cause (what good looks like)
+{state.get("root_cause", "")}
 
 ## Current Assessment
 Level: {state.get("current_level", 0)} ({state.get("level_name", 'NOT_ASSESSED')})
-Red Flags so far: {state.get("red_flags", [])}
-Green Flags so far: {state.get("green_flags", [])}
+Red Flags so far: {state.get("red_flags_observed", [])}
+Green Flags so far: {state.get("green_flags_observed", [])}
 
 ## Your Task
 Assess the candidate's current level based on the full conversation.
@@ -89,35 +92,21 @@ Determine what action the interviewer should take next.
     tokens_used = usage.get("input_tokens", 0) + usage.get("output_tokens", 0)
 
     # Update flags
-    red_flags = list(state.get("red_flags", []))
-    green_flags = list(state.get("green_flags", []))
+    red_flags = list(state.get("red_flags_observed", []))
+    green_flags = list(state.get("green_flags_observed", []))
 
     for flag in evaluation.get("red_flags", []):
-        if flag not in red_flags:
+        if flag and flag not in red_flags:
             red_flags.append(flag)
 
     for flag in evaluation.get("green_flags", []):
-        if flag not in green_flags:
+        if flag and flag not in green_flags:
             green_flags.append(flag)
-
-    # Determine guidance for interviewer
-    pending_guidance = None
-    action = evaluation.get("action", "DO_NOT_HELP")
-
-    if action in ["MINIMAL_HELP", "LIGHT_HELP"]:
-        pending_guidance = evaluation.get("interviewer_guidance")
 
     return {
         "current_level": evaluation.get("current_level", state.get("current_level", 0)),
         "level_name": evaluation.get("level_name", state.get("level_name", "NOT_ASSESSED")),
-        "red_flags": red_flags,
-        "green_flags": green_flags,
-        "pending_guidance": pending_guidance,
-        "last_evaluator_output": {
-            "level": evaluation.get("current_level"),
-            "justification": evaluation.get("level_justification"),
-            "action": action,
-            "data_to_share": evaluation.get("data_to_share"),
-        },
+        "red_flags_observed": red_flags,
+        "green_flags_observed": green_flags,
         "total_tokens": state.get("total_tokens", 0) + tokens_used,
     }

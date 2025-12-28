@@ -8,10 +8,10 @@ from state import InterviewState
 
 # Maximum interview duration in minutes
 MAX_DURATION_MINUTES = 30
-# Minimum areas to explore before ending
-MIN_AREAS_TO_COVER = 3
 # Maximum number of exchanges (candidate responses)
 MAX_EXCHANGES = 15
+# Minimum exchanges before allowing synthesis-based end
+MIN_EXCHANGES_FOR_SYNTHESIS = 5
 
 
 def director_node(state: InterviewState) -> Dict[str, Any]:
@@ -22,7 +22,7 @@ def director_node(state: InterviewState) -> Dict[str, Any]:
     1. Already marked complete
     2. Time limit exceeded
     3. Maximum exchanges reached
-    4. Most exploration areas covered and in synthesis phase
+    4. In synthesis phase with enough exchanges
     """
     # Check if already complete
     if state.get("is_complete"):
@@ -49,19 +49,13 @@ def director_node(state: InterviewState) -> Dict[str, Any]:
             "is_complete": True,
         }
 
-    # Check if enough areas have been explored and we're in synthesis
-    areas_explored = len(state.get("areas_explored", []))
-    total_areas = len(state.get("exploration_areas", []))
+    # Check if we're in synthesis phase with enough exchanges
     current_phase = state.get("current_phase", "STRUCTURING")
-
-    # End if we've covered most areas and reached synthesis
-    if areas_explored >= min(MIN_AREAS_TO_COVER, total_areas) and current_phase == "SYNTHESIS":
-        # Check if we've had at least a few synthesis exchanges
-        if num_exchanges >= 5:
-            return {
-                "should_continue": False,
-                "is_complete": True,
-            }
+    if current_phase == "SYNTHESIS" and num_exchanges >= MIN_EXCHANGES_FOR_SYNTHESIS:
+        return {
+            "should_continue": False,
+            "is_complete": True,
+        }
 
     # Continue the interview
     return {"should_continue": True}

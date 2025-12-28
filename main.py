@@ -13,15 +13,27 @@ def print_separator():
 
 def print_debug_info(state):
     """Print debug information (would be hidden in production)."""
-    print(
-        f"[DEBUG] Difficulty: {state['difficulty_level']}/5, "
-        f"Phase: {state['current_phase']}, "
-        f"Question: {state['current_question_index'] + 1}"
-    )
-    if state.get("last_evaluator_output"):
-        eval_out = state["last_evaluator_output"]
-        print(f"[DEBUG] Last Score: {eval_out.get('score', 'N/A')}/5")
-        print(f"[DEBUG] Directive: {eval_out.get('directive', 'N/A')}")
+    level = state.get("current_level", 0)
+    level_name = state.get("level_name", "NOT_ASSESSED")
+    trend = state.get("level_trend", "STABLE")
+    phase = state.get("current_phase", "UNKNOWN")
+
+    print(f"[DEBUG] Level: {level}/5 ({level_name}), Trend: {trend}, Phase: {phase}")
+
+    red_flags = state.get("red_flags_observed", [])
+    green_flags = state.get("green_flags_observed", [])
+
+    if red_flags:
+        print(f"[DEBUG] Red Flags: {red_flags}")
+    if green_flags:
+        print(f"[DEBUG] Green Flags: {green_flags}")
+
+    # Show level history if available
+    level_history = state.get("level_history", [])
+    if level_history and len(level_history) > 0:
+        latest = level_history[-1]
+        print(f"[DEBUG] Latest thinking: {latest.get('thinking', 'N/A')[:100]}...")
+
     print()
 
 
@@ -84,10 +96,19 @@ def run_interview(case_id: str, debug: bool = True):
                 print_debug_info(runner.get_state())
                 continue
 
-            if candidate_input.lower() == "scores":
-                print("\nScores so far:")
-                for score in runner.get_scores():
-                    print(f"  {score['question_id']}: {score['score']}/5")
+            if candidate_input.lower() == "level":
+                level, level_name = runner.get_current_level()
+                print(f"\nCurrent Level: {level}/5 ({level_name})\n")
+                continue
+
+            if candidate_input.lower() == "flags":
+                red_flags, green_flags = runner.get_flags()
+                print("\nRed Flags Observed:")
+                for flag in red_flags:
+                    print(f"  - {flag}")
+                print("\nGreen Flags Observed:")
+                for flag in green_flags:
+                    print(f"  - {flag}")
                 print()
                 continue
 
@@ -109,31 +130,35 @@ def run_interview(case_id: str, debug: bool = True):
     print_separator()
 
     final_state = runner.get_state()
-    final_score = final_state.get("final_score")
+    final_level = final_state.get("current_level", 0)
+    final_level_name = final_state.get("level_name", "NOT_ASSESSED")
 
-    if final_score is not None:
-        print(f"\nFinal Score: {final_score}/5")
-    else:
-        # Calculate if not set
-        scores = [qs["score"] for qs in runner.get_scores()]
-        if scores:
-            avg = sum(scores) / len(scores)
-            print(f"\nFinal Score: {avg:.2f}/5")
-        else:
-            print("\nNo scores recorded.")
+    print(f"\nFinal Assessment: Level {final_level}/5 ({final_level_name})")
 
-    print("\nQuestion Scores:")
-    print("-" * 40)
-    for qs in runner.get_scores():
-        print(f"  {qs['question_id']} ({qs['phase']}): {qs['score']}/5")
-        print(f"    Difficulty at time: {qs['difficulty_at_time']}")
-        print(f"    Reasoning: {qs['reasoning'][:100]}...")
-        print()
+    # Show flags summary
+    red_flags = final_state.get("red_flags_observed", [])
+    green_flags = final_state.get("green_flags_observed", [])
 
-    print("\nDifficulty Progression:")
-    difficulties = [qs["difficulty_at_time"] for qs in runner.get_scores()]
-    if difficulties:
-        print(f"  {' -> '.join(map(str, difficulties))}")
+    if red_flags:
+        print("\nRed Flags Observed:")
+        print("-" * 40)
+        for flag in red_flags:
+            print(f"  - {flag}")
+
+    if green_flags:
+        print("\nGreen Flags Observed:")
+        print("-" * 40)
+        for flag in green_flags:
+            print(f"  - {flag}")
+
+    # Show level progression
+    level_history = final_state.get("level_history", [])
+    if level_history:
+        print("\nLevel Progression:")
+        print("-" * 40)
+        levels = [h["level"] for h in level_history]
+        print(f"  {' -> '.join(map(str, levels))}")
+
     print()
 
 
@@ -148,7 +173,8 @@ def main():
 Commands during interview:
   quit, exit, q  - End the interview early
   debug          - Show current state information
-  scores         - Show scores so far
+  level          - Show current assessment level
+  flags          - Show observed red/green flags
 
 Examples:
   python main.py                    # Interactive case selection

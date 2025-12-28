@@ -92,10 +92,10 @@ class InterviewRunner:
         )
 
     def get_flags(self) -> tuple:
-        """Get red and green flags."""
+        """Get red and green flags observed during the interview."""
         return (
-            self.state.get("red_flags", []),
-            self.state.get("green_flags", [])
+            self.state.get("red_flags_observed", []),
+            self.state.get("green_flags_observed", [])
         )
 
     def get_messages(self) -> List[Message]:

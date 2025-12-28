@@ -1,154 +1,161 @@
 {
-    "title": "SaaS Market Entry - Southeast Asia",
-    "candidate_prompt": "Our client is CloudMetrics, a US-based B2B SaaS company that provides analytics dashboards for enterprise customers. They have $50M in annual revenue and are considering expanding into Southeast Asia. The CEO wants to know: should they enter this market, and if so, how?",
-    "case_objectives": [
-        "Evaluate market attractiveness of Southeast Asia",
-        "Assess company's right to win in this market",
-        "Recommend entry strategy if appropriate"
+    "title": "CloudMetrics - Southeast Asia Market Entry",
+
+    "opening": "CloudMetrics is a US-based B2B SaaS company that provides analytics dashboards for enterprise customers. They have $50M in annual revenue and are considering expanding into Southeast Asia. The CEO wants to know: should they enter this market, and if so, how?\n\nOver to you.",
+
+    "facts": {
+        "company": {
+            "annual_revenue": "$50M",
+            "customer_count": "500 enterprise customers",
+            "avg_contract_value": "$100K/year",
+            "pricing_model": "$15/user/month",
+            "current_growth_rate": "15% YoY (slowing from 25% two years ago)",
+            "profit_margin": "20%",
+            "sales_cycle": "6-9 months, heavily relationship-driven",
+            "product_localization": "Currently English-only"
+        },
+        "sea_market": {
+            "total_addressable_market": "$2B for enterprise analytics",
+            "growth_rate": "25% YoY (outpacing US at 10%)",
+            "key_countries": {
+                "singapore": "Small but enterprise-heavy, English-speaking, HQ for multinationals",
+                "indonesia": "Largest market by volume, Bahasa required, complex regulations",
+                "vietnam": "Fastest growing, Vietnamese required, strong tech talent pool",
+                "thailand": "Mid-sized, Thai language preferred, relationship-heavy",
+                "philippines": "English-speaking, but smaller enterprise segment"
+            },
+            "enterprise_adoption": "5 years behind US adoption curve",
+            "competitor_presence": "Mostly local players with limited functionality"
+        },
+        "challenges": {
+            "localization": {
+                "languages_needed": "5+ (Bahasa, Vietnamese, Thai, Tagalog, plus English)",
+                "effort": "6-12 months for full localization per language"
+            },
+            "payment_infrastructure": {
+                "credit_card_penetration": "Low (15-30% depending on country)",
+                "alternatives_needed": "Bank transfer, local e-wallets, invoicing"
+            },
+            "data_residency": {
+                "indonesia": "Requires local data storage for certain data types",
+                "vietnam": "Tightening data sovereignty requirements",
+                "singapore": "Flexible, common hub for regional data"
+            },
+            "sales_model": {
+                "current": "Inside sales + customer success from US",
+                "required": "Local sales presence, relationship-based selling, longer cycles"
+            }
+        },
+        "entry_options": {
+            "organic": {
+                "description": "Open Singapore office, hire 10-person team",
+                "investment": "$2-3M first year",
+                "timeline": "18-24 months to meaningful revenue",
+                "pros": "Full control, learn the market",
+                "cons": "Slow, high execution risk"
+            },
+            "partnership": {
+                "description": "Partner with regional system integrator",
+                "cost": "15-20% revenue share",
+                "timeline": "6-12 months to first deals",
+                "pros": "Faster, leverage local relationships",
+                "cons": "Less control, margin compression"
+            },
+            "acquisition": {
+                "description": "Acquire DataViz Asia (local competitor)",
+                "cost": "$8-12M (50 customers, $3M ARR)",
+                "timeline": "3-6 months to close, 12 months to integrate",
+                "pros": "Immediate presence, local team, customer base",
+                "cons": "Integration risk, product overlap"
+            }
+        }
+    },
+
+    "root_cause": "This is fundamentally a 'where to play, how to win' decision with three key insights:\n\n1. The market IS attractive: $2B TAM growing 25% with limited competition is compelling, especially as US growth slows\n\n2. Execution risk is the real issue: CloudMetrics' current model (English-only, inside sales, US-based) is a poor fit for SEA's relationship-driven, multi-language market\n\n3. The right answer is 'yes, but thoughtfully': Enter via Singapore as a beachhead (English-speaking, enterprise-heavy, regional hub), prove the model, then expand\n\nThe trap: Candidates who say 'yes, go big' miss the execution challenges. Candidates who say 'no, too risky' miss the strategic imperative as US growth slows.",
+
+    "strong_recommendations": [
+        "Enter the market - the strategic rationale is strong given slowing US growth",
+        "Start with Singapore as a beachhead (English-speaking, enterprise concentration)",
+        "Use partnership model initially to de-risk and learn the market",
+        "Set clear milestones: 10 customers in Year 1 before expanding",
+        "Defer Indonesia/Vietnam until localization is proven",
+        "Consider acquisition only after organic/partnership proves the model"
     ],
-    "grading_rubric": {
-        "level_1": {
-            "name": "Fail",
-            "description": "Unstructured & Superficial",
-            "indicators": [
-                "No clear framework for evaluating market entry",
-                "Jumps to conclusion without analysis (e.g., 'Yes, they should expand')",
-                "No consideration of market attractiveness or company fit",
-                "Cannot identify relevant factors for the decision",
-                "Generic statements without context (e.g., 'Asia is growing')",
-                "No understanding of B2B SaaS dynamics"
+
+    "calibration": {
+        "level_5": {
+            "name": "Outstanding",
+            "sounds_like": [
+                "Before I dive in - is the $50M revenue concentrated in a few large customers or distributed? That affects their risk appetite for this investment.",
+                "This is a 'where to play, how to win' question. My hypothesis is the market is attractive but their current model isn't built for it. I'd want to test: what would it take to win, and is that investment justified?",
+                "Let me segment the decision: market attractiveness, their right to win, and entry mode. I suspect the market passes, but their capabilities are the constraint.",
+                "Singapore makes sense as a beachhead - English-speaking, enterprise-heavy, and a hub for regional expansion. I'd want to validate deal sizes before committing to the investment."
             ],
-            "example": "Southeast Asia is a big market and growing fast, so they should definitely enter. They could open an office there.",
-            "action": "DO_NOT_HELP"
-        },
-        "level_2": {
-            "name": "Weak / Low Pass",
-            "description": "Structure Without Insight",
-            "indicators": [
-                "Basic market vs company framing",
-                "Lists generic factors (market size, competition) without prioritization",
-                "No hypothesis about whether entry makes sense",
-                "Asks for data without knowing what to test",
-                "Considers only one entry mode",
-                "Recommendations lack specificity"
-            ],
-            "example": "I'd look at market size, competition, and whether they have the resources. Can I see data on the market? They could either go alone or partner.",
-            "action": "MINIMAL_HELP"
-        },
-        "level_3": {
-            "name": "Good But Not Enough",
-            "description": "Solid but Non-Distinctive",
-            "indicators": [
-                "Clear framework: market attractiveness + right to win",
-                "Identifies relevant factors specific to B2B SaaS",
-                "Asks reasonable questions about TAM, competition, challenges",
-                "Compares entry modes with basic trade-offs",
-                "Provides recommendation but lacks conviction or detail",
-                "Limited consideration of risks or implementation"
-            ],
-            "example": "I'd structure this as: Is the market attractive? Can they win? How should they enter? The market seems attractive at $2B growing 25%. I'd want to understand competition and their capabilities.",
-            "action": "LIGHT_HELP_IF_STUCK"
+            "characteristics": "Frames as strategic choice, not just market sizing. Identifies execution risk as the key issue. Thinks about sequencing and de-risking. Asks about their current business to understand risk tolerance."
         },
         "level_4": {
             "name": "Clear Pass",
-            "description": "Strong, Structured, Commercial",
-            "indicators": [
-                "Comprehensive framework with clear decision criteria",
-                "Identifies key challenges specific to SEA (localization, payments, data residency)",
-                "Evaluates multiple entry modes with clear trade-offs",
-                "Shows understanding of B2B SaaS economics (CAC, LTV, payback)",
-                "Prioritized recommendation with supporting logic",
-                "Considers phasing, risks, and success metrics"
+            "sounds_like": [
+                "I'd structure this as market attractiveness, right to win, and entry mode. Let me start with the market.",
+                "The market looks attractive at $2B growing 25%. The question is whether they can win - what are their capabilities vs. what's needed?",
+                "I'd want to understand the competitive dynamics and what localization would require.",
+                "For entry mode, I'd compare organic vs. partnership vs. acquisition on speed, cost, and control."
             ],
-            "example": "Market entry decisions require: market attractiveness, right to win, and entry mode analysis. Given $2B TAM at 25% growth with low competition, the market is attractive. Key question is their ability to localize and sell relationship-driven deals.",
-            "action": "CHALLENGE_AND_EXTEND"
+            "characteristics": "Clear structure. Systematic analysis. Considers multiple entry modes. Solid but may miss the strategic context of slowing US growth."
         },
-        "level_5": {
-            "name": "Outstanding",
-            "description": "Excellent Performance",
-            "indicators": [
-                "Clear, logical decision framework tailored to context",
-                "Strong hypothesis about market fit and entry approach",
-                "Identifies nuanced challenges (country variation, local payments, data sovereignty)",
-                "Compares entry modes with quantitative reasoning",
-                "Recommends specific beachhead market with rationale",
-                "Actionable recommendation with milestones and risk mitigation",
-                "Demonstrates commercial awareness of SaaS metrics"
+        "level_3": {
+            "name": "Good But Not Enough",
+            "sounds_like": [
+                "I'd look at the market size and whether they can compete there.",
+                "Can I see data on the market? What's the TAM?",
+                "There seem to be some challenges with localization and local presence.",
+                "They could either build their own team or partner with someone local."
             ],
-            "example": "This is a classic 'where to play, how to win' question. My hypothesis is the market is attractive but execution risk is high. I'd evaluate: market (TAM/SAM by country), capability gaps (localization, sales model), and entry economics. Singapore as beachhead makes sense given enterprise concentration.",
-            "action": "LET_THEM_SHINE"
+            "characteristics": "Basic structure. Asks reasonable questions but not targeted. Sees challenges but doesn't prioritize. Considers entry modes but not deeply."
+        },
+        "level_2": {
+            "name": "Weak",
+            "sounds_like": [
+                "Southeast Asia is a big market, so it seems like a good opportunity.",
+                "Can you tell me more about the market?",
+                "They should probably have a local office to sell there.",
+                "The main risk is that it's a new market for them."
+            ],
+            "characteristics": "No clear framework. Waits to be fed information. Generic observations. Doesn't engage with the specific dynamics of B2B SaaS."
+        },
+        "level_1": {
+            "name": "Fail",
+            "sounds_like": [
+                "Yes, they should expand - Asia is growing fast.",
+                "They could open an office in Singapore.",
+                "I'm not sure what factors to consider.",
+                "Can you walk me through the options?"
+            ],
+            "characteristics": "Jumps to conclusion. No structure. Cannot engage with the complexity. Needs to be led entirely."
         }
     },
-    "hidden_facts": {
-        "company_info": {
-            "annual_revenue": "$50M",
-            "customer_count": 500,
-            "avg_contract_value": "$100K/year",
-            "pricing": "$15/user/month",
-            "current_growth_rate": "15% YoY",
-            "profit_margin": "20%"
-        },
-        "sea_market_data": {
-            "total_addressable_market": "$2B",
-            "growth_rate": "25% YoY",
-            "key_countries": ["Singapore", "Indonesia", "Vietnam", "Thailand", "Philippines"],
-            "competitor_presence": "Low - mostly local players",
-            "enterprise_adoption": "Growing rapidly, 5 years behind US"
-        },
-        "challenges": {
-            "localization": "Need local language support (5+ languages)",
-            "payment_methods": "Credit card penetration low, need local payment options",
-            "data_residency": "Some countries require local data storage",
-            "sales_model": "Relationship-driven, need local sales presence"
-        },
-        "options": {
-            "organic_expansion": "Open Singapore office, hire local team ($2M first year)",
-            "partnership": "Partner with local system integrator (15% revenue share)",
-            "acquisition": "Acquire local competitor DataViz Asia ($10M, 50 customers)"
-        }
-    },
-    "exploration_areas": [
-        {
-            "id": "problem_framing",
-            "phase": "STRUCTURING",
-            "description": "How candidate frames and structures the market entry decision",
-            "what_good_looks_like": "Clear framework with market attractiveness, right to win, entry mode analysis; forms hypothesis about key decision factors",
-            "what_bad_looks_like": "No framework, jumps to yes/no without structure, lists random considerations"
-        },
-        {
-            "id": "hypothesis_formation",
-            "phase": "STRUCTURING",
-            "description": "Whether candidate forms hypotheses before diving into data",
-            "what_good_looks_like": "Clear hypothesis about market fit, asks targeted questions to test assumptions",
-            "what_bad_looks_like": "Asks for all data without knowing what to test, no clear thesis"
-        },
-        {
-            "id": "market_analysis",
-            "phase": "ANALYSIS",
-            "description": "How candidate evaluates the Southeast Asian market opportunity",
-            "what_good_looks_like": "Considers TAM/SAM/SOM, growth drivers, adoption curve, competitive dynamics; segments by country",
-            "what_bad_looks_like": "Generic questions not specific to B2B SaaS or region, no understanding of market attractiveness"
-        },
-        {
-            "id": "challenges_assessment",
-            "phase": "ANALYSIS",
-            "description": "Identifying challenges specific to Southeast Asia market entry",
-            "what_good_looks_like": "Comprehensive coverage of localization, payments, data sovereignty, relationship selling; prioritizes challenges with mitigation ideas",
-            "what_bad_looks_like": "Cannot identify meaningful challenges, generic 'it's risky' without specifics"
-        },
-        {
-            "id": "entry_mode_analysis",
-            "phase": "ANALYSIS",
-            "description": "Evaluating different ways to enter the market",
-            "what_good_looks_like": "Evaluates build/buy/partner options with clear criteria, considers phasing and beachhead strategy, quantitative comparison",
-            "what_bad_looks_like": "Only considers one option without alternatives or trade-offs, no understanding of entry modes"
-        },
-        {
-            "id": "recommendations",
-            "phase": "SYNTHESIS",
-            "description": "Quality and prioritization of final recommendation",
-            "what_good_looks_like": "CEO-ready recommendation with market entry sequence, investment ask, milestones, risk mitigation",
-            "what_bad_looks_like": "No clear recommendation, contradicts analysis, wishy-washy answer"
-        }
+
+    "red_flags": [
+        "Jumps to 'yes expand' without analyzing execution challenges",
+        "Jumps to 'no too risky' without considering strategic imperative",
+        "Treats all SEA countries as the same (ignores language, regulation, market differences)",
+        "Focuses only on market size without considering right to win",
+        "Doesn't ask about their current sales model or capabilities",
+        "Cannot articulate entry mode trade-offs",
+        "Recommends 'go big' without a sequenced approach",
+        "No understanding of B2B SaaS economics (CAC, LTV, sales cycles)",
+        "Suggests they 'just hire local salespeople' without understanding relationship selling"
+    ],
+
+    "green_flags": [
+        "Recognizes this as a strategic decision (US growth slowing)",
+        "Asks about their current capabilities and what would need to change",
+        "Segments SEA by country - understands they're different markets",
+        "Identifies localization and sales model as key execution challenges",
+        "Suggests a beachhead strategy rather than going broad",
+        "Compares entry modes with clear criteria",
+        "Thinks about de-risking and sequencing",
+        "Sets milestones before full commitment",
+        "Understands partnership trade-offs (speed vs. control vs. margin)"
     ]
 }

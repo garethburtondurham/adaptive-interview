@@ -1,153 +1,125 @@
 {
-    "title": "Coffee Shop Profitability",
-    "candidate_prompt": "BeanScene is a national coffee chain with 500 locations. Revenue is up 5% YoY, but profits are down 20%. The CEO wants to understand why and what to do.",
-    "case_objectives": [
-        "Diagnose root cause of profit decline despite revenue growth",
-        "Demonstrate structured, hypothesis-driven thinking",
-        "Provide prioritized, commercially-sound recommendations"
+    "title": "BeanScene Coffee Chain - Profitability Decline",
+
+    "opening": "BeanScene is a national coffee chain with 500 locations. Revenue is up 5% year-over-year, but profits are down 20%. The CEO wants to understand why and what to do about it.\n\nOver to you.",
+
+    "facts": {
+        "revenue": {
+            "total_growth": "+5% YoY",
+            "price_vs_volume": "All from price increases; volume is flat",
+            "same_store_traffic": "Flat (0% growth)",
+            "product_mix": {
+                "coffee_share": "70% of revenue",
+                "food_share": "30% of revenue",
+                "food_attachment_trend": "Up 15% (customers buying more food with coffee)"
+            },
+            "promotional_sales": "Up 20% (more discounting)"
+        },
+        "costs": {
+            "labour": {
+                "change": "+18% YoY",
+                "drivers": "Wage inflation (+8%) plus scheduling inefficiency (+10%)",
+                "detail": "New menu items increased complexity; barista time per drink up 12%"
+            },
+            "coffee_beans": {
+                "change": "+8% YoY",
+                "driver": "Commodity price pressure"
+            },
+            "rent": "Flat",
+            "food_ingredients": "+5% YoY",
+            "packaging": "+3% YoY"
+        },
+        "margins": {
+            "coffee_margin": "70% (down from 75% due to bean costs)",
+            "food_margin": "35% (always been lower)",
+            "blended_trend": "Declining because mix shifting toward lower-margin food"
+        },
+        "stores": {
+            "total_count": 500,
+            "performance_variance": "Top quartile 3x more profitable than average",
+            "bottom_quartile": "Negative EBITDA (losing money)",
+            "new_store_cannibalization": "15% of new stores are cannibalizing existing locations"
+        }
+    },
+
+    "root_cause": "80% of profit decline comes from:\n1. Labour cost explosion (+18%) driven by menu complexity and wage inflation\n2. Mix shift toward lower-margin food products\n3. Revenue growth is 'hollow' - all price, no volume, plus more discounting\n\nNOT the main driver: Coffee bean costs (+8%) - this is a red herring that weak candidates fixate on.",
+
+    "strong_recommendations": [
+        "Simplify menu to reduce labour time per transaction",
+        "Address bottom-quartile stores (close or fix)",
+        "Reconsider food strategy - it's diluting margins",
+        "Reduce promotional/discount activity"
     ],
-    "grading_rubric": {
-        "level_1": {
-            "name": "Fail",
-            "description": "Unstructured & Superficial",
-            "indicators": [
-                "No structured diagnosis",
-                "Jumps straight to generic solutions (cut costs, raise prices)",
-                "No clarifying questions asked",
-                "No breakdown of P&L or profit equation",
-                "Mentions vague factors like 'inflation' without analysis",
-                "No prioritization or evidence-based thinking"
+
+    "calibration": {
+        "level_5": {
+            "name": "Outstanding",
+            "sounds_like": [
+                "Before I dive in - is the 20% decline on absolute profit or margin? And is this across all stores or concentrated?",
+                "Revenue up but profit down sharply tells me costs grew faster than revenue. Given the magnitude - 20% profit decline on 5% revenue growth - this isn't a small cost creep, something structural changed.",
+                "I'd want to separate: is the revenue growth real? Is it price or volume? And on costs - what's fixed versus variable, and which moved?",
+                "Labour at +18% is the standout. That's not just wage inflation - something operational is broken. What changed in how stores operate?"
             ],
-            "example": "Profits are down because costs are probably higher, like rent and wages. They should increase prices or cut staff.",
-            "action": "DO_NOT_HELP"
-        },
-        "level_2": {
-            "name": "Weak / Low Pass",
-            "description": "Structure Without Insight",
-            "indicators": [
-                "Basic revenue vs costs framing",
-                "Correctly notes costs must be the issue",
-                "Lists possible cost drivers but treats all equally",
-                "No hypothesis formed before asking for data",
-                "Generic recommendations without prioritization",
-                "Asks for data but doesn't know what to do with it"
-            ],
-            "example": "Let me break this into revenue and costs. Revenue is up so it must be costs. Could be labour, rent, beans, utilities. Can I see the cost breakdown?",
-            "action": "MINIMAL_HELP"
-        },
-        "level_3": {
-            "name": "Good But Not Enough",
-            "description": "Solid but Non-Distinctive",
-            "indicators": [
-                "Clean profit equation structure",
-                "Forms hypothesis about margin pressure",
-                "Asks whether growth is price or volume led",
-                "Identifies primary cost drivers with data",
-                "Mix of reasonable recommendations",
-                "Lacks sharp prioritization and conviction"
-            ],
-            "example": "Profit = Revenue - Costs. Revenue up 5% but profit down 20% suggests margin compression. I'd want to know if revenue growth is price or volume, and which costs increased most.",
-            "action": "LIGHT_HELP_IF_STUCK"
+            "characteristics": "Forms hypotheses before asking for data. Sees through the numbers to underlying drivers. Prioritizes ruthlessly. Catches red herrings."
         },
         "level_4": {
             "name": "Clear Pass",
-            "description": "Strong, Structured, Commercial",
-            "indicators": [
-                "Clarifies objective upfront",
-                "Hypothesizes revenue masking margin erosion",
-                "Segments analysis (same-store vs new, fixed vs variable, product mix)",
-                "Identifies specific drivers with quantification",
-                "Prioritized recommendations with clear logic",
-                "Addresses risks and next steps",
-                "CEO-ready synthesis"
+            "sounds_like": [
+                "Let me structure this as profit equals revenue minus costs. Revenue is up, so this is likely a cost problem.",
+                "Can I see the cost breakdown? I'd expect the issue to be in variable costs since those would scale with any operational changes.",
+                "Labour is the biggest increase at 18%. I'd want to understand if that's wage rates, headcount, or efficiency.",
+                "For recommendations, I'd prioritize the labour issue since it's the largest driver."
             ],
-            "example": "The objective is to restore profit sustainably. Revenue up but profit down sharply suggests margin erosion. I'd segment by same-store vs new-store, and fixed vs variable costs to isolate the driver.",
-            "action": "CHALLENGE_AND_EXTEND"
+            "characteristics": "Clear structure. Asks logical questions. Identifies the main driver. Solid but doesn't find the nuances."
         },
-        "level_5": {
-            "name": "Outstanding",
-            "description": "Excellent Performance",
-            "indicators": [
-                "Clear, logical framework for analyzing the problem",
-                "Strong hypothesis about margin pressure or cost drivers",
-                "Asks targeted, insightful questions to test hypotheses",
-                "Identifies key drivers with reasoning (e.g., labour costs, product mix)",
-                "Specific, prioritized recommendations",
-                "Considers implementation or next steps",
-                "Demonstrates commercial awareness"
+        "level_3": {
+            "name": "Good But Not Enough",
+            "sounds_like": [
+                "I'd look at revenue and costs separately.",
+                "Can I see the income statement or cost breakdown?",
+                "Costs are up across the board. Labour and beans seem high.",
+                "They should try to reduce costs and maybe look at pricing."
             ],
-            "example": "Profit declining while revenue grows suggests margin compression. Let me structure this as revenue quality vs cost drivers. My hypothesis is variable costs are outpacing revenue growth - I'd want to see the cost breakdown by category.",
-            "action": "LET_THEM_SHINE"
+            "characteristics": "Basic structure. Asks for data but not targeted. Sees issues but doesn't prioritize. Generic recommendations."
+        },
+        "level_2": {
+            "name": "Weak",
+            "sounds_like": [
+                "So profits are down... what information do you have?",
+                "Can you tell me more about the business?",
+                "It seems like costs are the problem. They should cut costs.",
+                "Maybe they could raise prices or open more stores?"
+            ],
+            "characteristics": "No structure. Waits to be fed information. States the obvious. Recommendations don't follow from analysis."
+        },
+        "level_1": {
+            "name": "Fail",
+            "sounds_like": [
+                "They should cut costs and raise prices.",
+                "It's probably inflation.",
+                "I'm not sure where to start.",
+                "Can you walk me through it?"
+            ],
+            "characteristics": "No structure. Jumps to conclusions. Cannot engage with the problem. Needs to be led entirely."
         }
     },
-    "hidden_facts": {
-        "revenue_analysis": {
-            "same_store_traffic": "Flat (0% growth)",
-            "revenue_growth_source": "Price increases (5%) not volume",
-            "food_attachment_rate": "Up 15% (but lower margin)",
-            "promotional_sales": "Up 20% (discounted)"
-        },
-        "cost_analysis": {
-            "labour_cost_change": "+18% (wage inflation + scheduling inefficiency)",
-            "labour_cost_per_transaction": "Up 12% due to menu complexity",
-            "coffee_bean_costs": "+8% (commodity pressure)",
-            "rent": "Flat",
-            "food_ingredient_costs": "+5%"
-        },
-        "store_performance": {
-            "bottom_quartile_stores": "Deeply unprofitable (negative EBITDA)",
-            "new_store_cannibalization": "15% of new stores cannibalizing existing locations",
-            "store_level_variance": "Top quartile 3x more profitable than average"
-        },
-        "margin_analysis": {
-            "coffee_margin": "70% (down from 75%)",
-            "food_margin": "35% (always lower)",
-            "blended_margin_trend": "Declining due to mix shift to food"
-        },
-        "root_cause_summary": "80% of profit decline from labour inefficiency and low-margin product mix, not commodity costs"
-    },
-    "exploration_areas": [
-        {
-            "id": "problem_framing",
-            "phase": "STRUCTURING",
-            "description": "How candidate frames and structures the problem",
-            "what_good_looks_like": "Profit equation, hypothesis that costs are issue, segments for analysis",
-            "what_bad_looks_like": "No structure, jumps to solutions, treats all factors equally"
-        },
-        {
-            "id": "hypothesis_formation",
-            "phase": "STRUCTURING",
-            "description": "Whether candidate forms hypotheses before diving into data",
-            "what_good_looks_like": "Clear hypothesis about margin erosion, asks targeted questions",
-            "what_bad_looks_like": "Asks for all data without knowing what to test"
-        },
-        {
-            "id": "cost_analysis",
-            "phase": "ANALYSIS",
-            "description": "How candidate analyzes cost drivers",
-            "what_good_looks_like": "Segments fixed/variable, identifies labour as key driver, quantifies impact",
-            "what_bad_looks_like": "Lists costs without prioritization, focuses on wrong drivers"
-        },
-        {
-            "id": "revenue_quality",
-            "phase": "ANALYSIS",
-            "description": "Understanding that revenue growth quality matters",
-            "what_good_looks_like": "Asks if growth is price/volume led, identifies mix shift issue",
-            "what_bad_looks_like": "Assumes revenue is fine because it's growing"
-        },
-        {
-            "id": "recommendations",
-            "phase": "SYNTHESIS",
-            "description": "Quality and prioritization of recommendations",
-            "what_good_looks_like": "Prioritized by impact, specific actions, addresses risks",
-            "what_bad_looks_like": "Generic (cut costs, raise prices), no prioritization"
-        },
-        {
-            "id": "synthesis",
-            "phase": "SYNTHESIS",
-            "description": "CEO-ready synthesis and conviction",
-            "what_good_looks_like": "Clear answer, quantified impact, action plan",
-            "what_bad_looks_like": "Wishy-washy, no clear recommendation"
-        }
+
+    "red_flags": [
+        "Fixates on coffee bean costs as the main issue (it's only +8%)",
+        "Ignores the labour cost explosion",
+        "Doesn't question the quality of revenue growth",
+        "Jumps to 'raise prices' without checking if they already did",
+        "Cannot do basic math (if revenue +5% and profit -20%, costs grew significantly faster)",
+        "Suggests 'cut costs' without identifying which costs matter"
+    ],
+
+    "green_flags": [
+        "Recognizes profit decline magnitude implies structural cost change",
+        "Asks if revenue growth is price or volume",
+        "Identifies labour as the key cost driver",
+        "Probes WHY labour costs increased (not just that they did)",
+        "Notices the mix shift toward lower-margin products",
+        "Questions store-level variance",
+        "Recommendations are specific and prioritized"
     ]
 }

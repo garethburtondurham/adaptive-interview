@@ -10,7 +10,7 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import SystemMessage, HumanMessage
 
 from state import InterviewState, Message
-from case_loader import get_exploration_areas, get_unexplored_areas
+from case_loader import get_case_data
 from prompts.interviewer_prompt import get_interviewer_system_prompt
 
 # Initialize LLM
@@ -32,15 +32,16 @@ def parse_interviewer_response(response_text: str) -> Dict[str, Any]:
 
         return json.loads(text.strip())
     except json.JSONDecodeError:
+        # Fallback: treat the whole response as the spoken message
         return {
-            "message": response_text,
-            "internal_assessment": {
-                "current_level": 0,
-                "level_trend": "STABLE",
-                "key_observation": "Could not parse assessment"
-            },
-            "areas_touched": [],
-            "current_phase": "ANALYSIS",
+            "spoken": response_text,
+            "assessment": {
+                "level": 0,
+                "trend": "STABLE",
+                "thinking": "Could not parse assessment",
+                "red_flags_observed": [],
+                "green_flags_observed": []
+            }
         }
 
 
@@ -56,8 +57,11 @@ def interviewer_node(state: InterviewState) -> Dict[str, Any]:
     if not state["messages"]:
         return generate_opening_message(state)
 
-    # Build context for the interviewer
-    system_prompt = get_interviewer_system_prompt()
+    # Build case data for the dynamic prompt
+    case_data = get_case_data(state)
+
+    # Get the system prompt with case context built in
+    system_prompt = get_interviewer_system_prompt(case_data)
 
     # Get recent conversation
     recent_messages = state["messages"][-10:]
@@ -66,50 +70,25 @@ def interviewer_node(state: InterviewState) -> Dict[str, Any]:
         for m in recent_messages
     ])
 
-    # Get case grading rubric if available
-    grading_context = ""
-    case_data = state.get("exploration_areas", [])
-
-    # Get all exploration areas
-    all_areas = get_exploration_areas(state)
-    areas_summary = "\n".join([
-        f"- {area['id']}: {area['description']}"
-        for area in all_areas
-    ])
-
     # Current assessment context
     current_level = state.get("current_level", 0)
     level_name = state.get("level_name", "NOT_ASSESSED")
+    level_trend = state.get("level_trend", "STABLE")
 
-    context = f"""
-## Case
-Title: {state["case_title"]}
-Prompt: {state["case_prompt"]}
+    context = f"""## Current Session State
 
-## Current Assessment
-Level: {current_level} ({level_name})
-Red Flags: {state.get("red_flags", [])}
-Green Flags: {state.get("green_flags", [])}
+**Assessment So Far:**
+- Level: {current_level} ({level_name})
+- Trend: {level_trend}
+- Red flags observed: {state.get("red_flags_observed", [])}
+- Green flags observed: {state.get("green_flags_observed", [])}
 
-## Conversation
+**Conversation:**
 {conversation_history}
 
-## Exploration Areas
-{areas_summary}
+---
 
-## Areas Covered
-{', '.join(state.get("areas_explored", [])) or "None yet"}
-
-## Hidden Facts (share ONLY when earned with hypothesis)
-{json.dumps(state.get("hidden_facts", {}), indent=2)}
-
-## Evaluator Guidance (if any)
-{state.get("pending_guidance", "None")}
-
-## Your Task
-Respond to the candidate's last message. Assess their level and adjust your behavior accordingly.
-Remember: DO NOT rescue Level 1-2 candidates. Only help Level 3+ on execution, not thinking.
-"""
+Respond to the candidate's last message."""
 
     messages = [
         SystemMessage(content=system_prompt),
@@ -123,21 +102,19 @@ Remember: DO NOT rescue Level 1-2 candidates. Only help Level 3+ on execution, n
     usage = response.response_metadata.get("usage", {})
     tokens_used = usage.get("input_tokens", 0) + usage.get("output_tokens", 0)
 
+    # Extract the spoken message
+    spoken = parsed.get("spoken", response.content)
+
     new_message = Message(
         role="interviewer",
-        content=parsed.get("message", response.content),
+        content=spoken,
         timestamp=datetime.utcnow().isoformat(),
     )
 
-    # Update areas explored
-    current_areas = list(state.get("areas_explored", []))
-    for area in parsed.get("areas_touched", []):
-        if area not in current_areas:
-            current_areas.append(area)
-
     # Extract assessment
-    assessment = parsed.get("internal_assessment", {})
-    new_level = assessment.get("current_level", state.get("current_level", 0))
+    assessment = parsed.get("assessment", {})
+    new_level = assessment.get("level", state.get("current_level", 0))
+    new_trend = assessment.get("trend", "STABLE")
 
     # Map level number to name
     level_names = {
@@ -149,34 +126,44 @@ Remember: DO NOT rescue Level 1-2 candidates. Only help Level 3+ on execution, n
     }
     new_level_name = level_names.get(new_level, "NOT_ASSESSED")
 
+    # Accumulate red flags and green flags (don't duplicate)
+    current_red_flags = list(state.get("red_flags_observed", []))
+    current_green_flags = list(state.get("green_flags_observed", []))
+
+    for flag in assessment.get("red_flags_observed", []):
+        if flag and flag not in current_red_flags:
+            current_red_flags.append(flag)
+
+    for flag in assessment.get("green_flags_observed", []):
+        if flag and flag not in current_green_flags:
+            current_green_flags.append(flag)
+
     # Track level history
     level_history = list(state.get("level_history", []))
     if new_level > 0:
         level_history.append({
             "level": new_level,
-            "observation": assessment.get("key_observation", ""),
+            "trend": new_trend,
+            "thinking": assessment.get("thinking", ""),
             "timestamp": datetime.utcnow().isoformat()
         })
 
-    new_phase = parsed.get("current_phase", state.get("current_phase", "ANALYSIS"))
-
     return {
         "messages": state["messages"] + [new_message],
-        "areas_explored": current_areas,
         "current_level": new_level,
         "level_name": new_level_name,
+        "level_trend": new_trend,
         "level_history": level_history,
-        "current_phase": new_phase,
-        "pending_guidance": None,
+        "red_flags_observed": current_red_flags,
+        "green_flags_observed": current_green_flags,
         "total_tokens": state.get("total_tokens", 0) + tokens_used,
     }
 
 
 def generate_opening_message(state: InterviewState) -> Dict[str, Any]:
-    """Generate the initial case presentation."""
-    opening = f"""{state["case_prompt"]}
-
-Over to you."""
+    """Generate the initial case presentation using the opening from case data."""
+    # The opening now comes directly from the case file
+    opening = state["opening"]
 
     new_message = Message(
         role="interviewer",
@@ -193,7 +180,6 @@ Over to you."""
 def generate_closing_message(state: InterviewState) -> Dict[str, Any]:
     """Generate the interview closing."""
     current_level = state.get("current_level", 0)
-    level_name = state.get("level_name", "NOT_ASSESSED")
 
     closing = """That's a good place to wrap up. Thank you for working through this case with me."""
 
