@@ -140,13 +140,73 @@ adaptive_interview/
 ├── cases/
 │   ├── coffee_profitability.json
 │   └── market_entry.json
+├── api/                    # FastAPI backend for candidate app
+│   ├── main.py             # API server entry point
+│   └── routes/
+│       └── interview.py    # Interview API endpoints
+├── candidate-app/          # React candidate interface
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   └── package.json
 └── ui/
-    └── streamlit_app.py    # Web interface
+    └── reviewer_dashboard.py  # Streamlit reviewer/admin interface
 ```
+
+## Two Interfaces
+
+This system has **two separate interfaces** serving different purposes:
+
+### 1. Candidate App (`candidate-app/`)
+**What candidates see during interviews.**
+
+- Clean, professional chat interface
+- No visible scoring, flags, or assessment information
+- Mobile-responsive design
+- Focuses entirely on the conversation
+
+### 2. Reviewer Dashboard (`ui/reviewer_dashboard.py`)
+**Internal tool for reviewing assessments and debugging.**
+
+- Shows real-time assessment levels (1-5)
+- Displays red/green flags as they accumulate
+- Shows evaluator guidance and actions
+- Debug information and level history
+- Token usage tracking
 
 ## Running the System
 
-### CLI Mode
+### Option 1: Candidate App (React + FastAPI)
+
+For candidate-facing interviews with the clean React interface:
+
+```bash
+# Terminal 1: Start the API server
+uvicorn api.main:app --reload --port 8000
+
+# Terminal 2: Start the React app
+cd candidate-app
+npm install    # First time only
+npm run dev
+```
+
+Open http://localhost:5173 for the candidate interface.
+
+### Option 2: Reviewer Dashboard (Streamlit)
+
+For reviewing assessments and debugging:
+
+```bash
+streamlit run ui/reviewer_dashboard.py
+```
+
+Open http://localhost:8501 for the reviewer dashboard.
+
+### Option 3: CLI Mode
+
+For development and testing:
+
 ```bash
 python main.py                    # Interactive case selection
 python main.py coffee_profitability  # Run specific case
@@ -157,12 +217,6 @@ python main.py --list             # List available cases
 - `debug` - Show current state
 - `scores` - Show assessment history
 - `quit` - End early
-
-### Web UI
-```bash
-cd ui
-streamlit run streamlit_app.py
-```
 
 ## What We're Trying to Achieve
 
@@ -225,14 +279,29 @@ When tuning the system:
 
 ## Dependencies
 
+### Python (Backend)
 - `langgraph>=0.2.0` - Agent graph orchestration
 - `langchain-anthropic>=0.2.0` - Claude LLM integration
-- `streamlit>=1.38.0` - Web UI
+- `fastapi>=0.109.0` - API server for candidate app
+- `uvicorn>=0.27.0` - ASGI server
+- `streamlit>=1.38.0` - Reviewer dashboard
 - Claude Sonnet 4 (`claude-sonnet-4-20250514`) - Both agents
+
+### Node.js (Candidate App)
+- React 18
+- Vite 5
+- Tailwind CSS 3
 
 ## Environment Setup
 
 ```bash
 # Create .env file
 ANTHROPIC_API_KEY=your_key_here
+
+# Install Python dependencies
+pip install fastapi uvicorn
+
+# Install React dependencies
+cd candidate-app
+npm install
 ```
