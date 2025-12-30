@@ -1,10 +1,15 @@
 """
 Interviewer Agent - Candidate-facing conversation handler.
+Executes the interview methodology and follows evaluator guidance.
 This is the ONLY agent the candidate interacts with.
 """
+from pathlib import Path
 from typing import Dict, Any
 from datetime import datetime
 import json
+
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import SystemMessage, HumanMessage
@@ -33,21 +38,13 @@ def parse_interviewer_response(response_text: str) -> Dict[str, Any]:
         return json.loads(text.strip())
     except json.JSONDecodeError:
         # Fallback: treat the whole response as the spoken message
-        return {
-            "spoken": response_text,
-            "assessment": {
-                "level": 0,
-                "trend": "STABLE",
-                "thinking": "Could not parse assessment",
-                "red_flags_observed": [],
-                "green_flags_observed": []
-            }
-        }
+        return {"spoken": response_text}
 
 
 def interviewer_node(state: InterviewState) -> Dict[str, Any]:
     """
     Generate the interviewer's response to the candidate.
+    Follows evaluator guidance for how to respond.
     """
     # Check if interview is complete
     if state.get("is_complete"):
@@ -60,7 +57,7 @@ def interviewer_node(state: InterviewState) -> Dict[str, Any]:
     # Build case data for the dynamic prompt
     case_data = get_case_data(state)
 
-    # Get the system prompt with case context built in
+    # Get the system prompt with case context
     system_prompt = get_interviewer_system_prompt(case_data)
 
     # Get recent conversation
@@ -70,25 +67,26 @@ def interviewer_node(state: InterviewState) -> Dict[str, Any]:
         for m in recent_messages
     ])
 
-    # Current assessment context
-    current_level = state.get("current_level", 0)
-    level_name = state.get("level_name", "NOT_ASSESSED")
-    level_trend = state.get("level_trend", "STABLE")
+    # Get evaluator guidance
+    evaluator_action = state.get("evaluator_action", "DO_NOT_HELP")
+    evaluator_guidance = state.get("evaluator_guidance", "")
+    data_to_share = state.get("data_to_share")
 
-    context = f"""## Current Session State
+    context = f"""## Evaluator Guidance
 
-**Assessment So Far:**
-- Level: {current_level} ({level_name})
-- Trend: {level_trend}
-- Red flags observed: {state.get("red_flags_observed", [])}
-- Green flags observed: {state.get("green_flags_observed", [])}
+**Action:** {evaluator_action}
+**Specific guidance:** {evaluator_guidance}
+**Data approved to share:** {data_to_share if data_to_share else "None - do not share data unless candidate earns it"}
 
-**Conversation:**
+---
+
+## Conversation So Far
+
 {conversation_history}
 
 ---
 
-Respond to the candidate's last message."""
+Respond to the candidate's last message, following the evaluator's guidance and your methodology principles."""
 
     messages = [
         SystemMessage(content=system_prompt),
@@ -111,63 +109,29 @@ Respond to the candidate's last message."""
         timestamp=datetime.utcnow().isoformat(),
     )
 
-    # Extract assessment
-    assessment = parsed.get("assessment", {})
-    new_level = assessment.get("level", state.get("current_level", 0))
-    new_trend = assessment.get("trend", "STABLE")
-
-    # Map level number to name
-    level_names = {
-        1: "FAIL",
-        2: "WEAK",
-        3: "GOOD_NOT_ENOUGH",
-        4: "CLEAR_PASS",
-        5: "OUTSTANDING"
-    }
-    new_level_name = level_names.get(new_level, "NOT_ASSESSED")
-
-    # Accumulate red flags and green flags (don't duplicate)
-    current_red_flags = list(state.get("red_flags_observed", []))
-    current_green_flags = list(state.get("green_flags_observed", []))
-
-    for flag in assessment.get("red_flags_observed", []):
-        if flag and flag not in current_red_flags:
-            current_red_flags.append(flag)
-
-    for flag in assessment.get("green_flags_observed", []):
-        if flag and flag not in current_green_flags:
-            current_green_flags.append(flag)
-
-    # Track level history
-    level_history = list(state.get("level_history", []))
-    if new_level > 0:
-        level_history.append({
-            "level": new_level,
-            "trend": new_trend,
-            "thinking": assessment.get("thinking", ""),
-            "timestamp": datetime.utcnow().isoformat()
-        })
-
     return {
         "messages": state["messages"] + [new_message],
-        "current_level": new_level,
-        "level_name": new_level_name,
-        "level_trend": new_trend,
-        "level_history": level_history,
-        "red_flags_observed": current_red_flags,
-        "green_flags_observed": current_green_flags,
         "total_tokens": state.get("total_tokens", 0) + tokens_used,
     }
 
 
 def generate_opening_message(state: InterviewState) -> Dict[str, Any]:
-    """Generate the initial case presentation using the opening from case data."""
-    # The opening now comes directly from the case file
+    """Generate the initial case presentation with introduction expectations."""
     opening = state["opening"]
+
+    # Remove trailing "Over to you." if present (we'll add our own ending)
+    opening = opening.replace("\n\nOver to you.", "").replace("Over to you.", "").strip()
+
+    # Brief expectations after the case
+    intro = """Take a moment to gather your thoughts. Feel free to ask any clarifying questions, and when you're ready, share how you'd like to approach this. There's no single right answer — I'm interested in your thinking.
+
+Over to you."""
+
+    full_opening = opening + "\n\n" + intro
 
     new_message = Message(
         role="interviewer",
-        content=opening,
+        content=full_opening,
         timestamp=datetime.utcnow().isoformat(),
     )
 
@@ -179,9 +143,7 @@ def generate_opening_message(state: InterviewState) -> Dict[str, Any]:
 
 def generate_closing_message(state: InterviewState) -> Dict[str, Any]:
     """Generate the interview closing."""
-    current_level = state.get("current_level", 0)
-
-    closing = """That's a good place to wrap up. Thank you for working through this case with me."""
+    closing = "That's a good place to wrap up. Thank you for working through this case with me."
 
     new_message = Message(
         role="interviewer",
@@ -192,6 +154,6 @@ def generate_closing_message(state: InterviewState) -> Dict[str, Any]:
     return {
         "messages": state["messages"] + [new_message],
         "is_complete": True,
-        "final_score": current_level,
+        "final_score": state.get("current_level", 0),
         "current_phase": "COMPLETE",
     }

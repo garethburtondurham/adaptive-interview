@@ -1,5 +1,11 @@
 """
 LangGraph construction for the Adaptive Case Interview System.
+
+New Flow (Evaluator-Driven):
+1. Candidate responds
+2. Evaluator assesses and provides guidance
+3. Interviewer responds following evaluator guidance
+4. Director checks constraints
 """
 from typing import Dict, Any, List
 from datetime import datetime
@@ -15,8 +21,8 @@ class InterviewRunner:
     High-level interface for running interviews.
 
     Flow:
-    1. Interviewer responds and assesses inline
-    2. Every 3 responses, run detailed evaluator assessment
+    1. Evaluator assesses candidate and provides guidance (runs FIRST)
+    2. Interviewer responds following evaluator guidance
     3. Director checks if interview should end
     """
 
@@ -26,6 +32,7 @@ class InterviewRunner:
 
     def start(self) -> str:
         """Start the interview and return the opening message."""
+        # For opening, just call interviewer directly (no candidate response yet)
         result = interviewer_node(self.state)
         self.state = {**self.state, **result}
         return self._get_last_interviewer_message()
@@ -41,16 +48,15 @@ class InterviewRunner:
         self.state["messages"] = self.state["messages"] + [candidate_message]
         self.response_count += 1
 
-        # Run detailed evaluator every 3 responses for calibration
-        if self.response_count % 3 == 0:
-            evaluator_result = evaluator_node(self.state)
-            self.state = {**self.state, **evaluator_result}
+        # 1. Run evaluator FIRST - assess candidate and provide guidance
+        evaluator_result = evaluator_node(self.state)
+        self.state = {**self.state, **evaluator_result}
 
-        # Run interviewer (which also does inline assessment)
+        # 2. Run interviewer - follows evaluator guidance
         interviewer_result = interviewer_node(self.state)
         self.state = {**self.state, **interviewer_result}
 
-        # Run director to check constraints
+        # 3. Run director to check constraints
         director_result = director_node(self.state)
         self.state = {**self.state, **director_result}
 
@@ -96,6 +102,13 @@ class InterviewRunner:
         return (
             self.state.get("red_flags_observed", []),
             self.state.get("green_flags_observed", [])
+        )
+
+    def get_evaluator_guidance(self) -> tuple:
+        """Get the current evaluator guidance."""
+        return (
+            self.state.get("evaluator_action", ""),
+            self.state.get("evaluator_guidance", "")
         )
 
     def get_messages(self) -> List[Message]:

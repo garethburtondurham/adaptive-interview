@@ -59,6 +59,11 @@ def initialize_interview_state(
         red_flags_observed=[],
         green_flags_observed=[],
 
+        # Evaluator guidance (set by evaluator, used by interviewer)
+        evaluator_action="",
+        evaluator_guidance="",
+        data_to_share=None,
+
         # Scoring
         question_scores=[],
 

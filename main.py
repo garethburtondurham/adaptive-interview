@@ -2,7 +2,12 @@
 Main entry point for the Adaptive Case Interview System.
 Provides a CLI interface for running interviews.
 """
+from pathlib import Path
 import sys
+
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).parent / ".env")
+
 from case_loader import initialize_interview_state, get_available_cases
 from graph import InterviewRunner
 
@@ -20,6 +25,14 @@ def print_debug_info(state):
 
     print(f"[DEBUG] Level: {level}/5 ({level_name}), Trend: {trend}, Phase: {phase}")
 
+    # Show evaluator guidance
+    action = state.get("evaluator_action", "")
+    guidance = state.get("evaluator_guidance", "")
+    if action:
+        print(f"[DEBUG] Evaluator Action: {action}")
+    if guidance:
+        print(f"[DEBUG] Evaluator Guidance: {guidance[:100]}...")
+
     red_flags = state.get("red_flags_observed", [])
     green_flags = state.get("green_flags_observed", [])
 
@@ -32,7 +45,7 @@ def print_debug_info(state):
     level_history = state.get("level_history", [])
     if level_history and len(level_history) > 0:
         latest = level_history[-1]
-        print(f"[DEBUG] Latest thinking: {latest.get('thinking', 'N/A')[:100]}...")
+        print(f"[DEBUG] Latest justification: {latest.get('justification', 'N/A')[:100]}...")
 
     print()
 

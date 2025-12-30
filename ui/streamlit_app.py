@@ -123,26 +123,40 @@ with st.sidebar:
             candidate_msgs = [m for m in state.get("messages", []) if m["role"] == "candidate"]
             st.metric("Exchanges", len(candidate_msgs))
 
+        # Evaluator Guidance
+        evaluator_action = state.get("evaluator_action", "")
+        evaluator_guidance = state.get("evaluator_guidance", "")
+        if evaluator_action:
+            with st.expander("Evaluator", expanded=True):
+                st.code(evaluator_action, language=None)
+                if evaluator_guidance:
+                    # Truncate and use a scrollable container
+                    guidance_text = evaluator_guidance[:120] + "..." if len(evaluator_guidance) > 120 else evaluator_guidance
+                    st.caption(guidance_text)
+
         # Flags
-        red_flags = state.get("red_flags", [])
-        green_flags = state.get("green_flags", [])
+        red_flags = state.get("red_flags_observed", [])
+        green_flags = state.get("green_flags_observed", [])
 
         if red_flags or green_flags:
-            with st.expander("Performance Signals", expanded=True):
+            with st.expander("Signals", expanded=True):
                 if green_flags:
-                    st.write("**✅ Strengths:**")
-                    for flag in green_flags[-3:]:  # Show last 3
-                        st.write(f"• {flag}")
+                    for flag in green_flags[-2:]:  # Show last 2 only
+                        flag_text = flag[:60] + "..." if len(flag) > 60 else flag
+                        st.success(flag_text, icon="✅")
 
                 if red_flags:
-                    st.write("**⚠️ Concerns:**")
-                    for flag in red_flags[-3:]:
-                        st.write(f"• {flag}")
+                    for flag in red_flags[-2:]:  # Show last 2 only
+                        flag_text = flag[:60] + "..." if len(flag) > 60 else flag
+                        st.error(flag_text, icon="⚠️")
 
         # Debug
         with st.expander("Debug", expanded=False):
-            if state.get("last_evaluator_output"):
-                st.json(state["last_evaluator_output"])
+            st.write("**Level History:**")
+            level_history = state.get("level_history", [])
+            if level_history:
+                for entry in level_history[-3:]:
+                    st.write(f"Level {entry.get('level')}: {entry.get('justification', '')[:100]}...")
 
         st.divider()
         if st.button("Reset Interview", type="secondary", use_container_width=True):
@@ -212,8 +226,8 @@ else:
             st.metric("Exchanges", len(msgs))
 
         # Flags summary
-        red_flags = state.get("red_flags", [])
-        green_flags = state.get("green_flags", [])
+        red_flags = state.get("red_flags_observed", [])
+        green_flags = state.get("green_flags_observed", [])
 
         if green_flags:
             st.subheader("✅ Strengths Demonstrated")
@@ -239,9 +253,73 @@ else:
             st.rerun()
 
     else:
-        st.subheader(f"Case: {state['case_title']}")
+        # Display the case question prominently at the top (separate from guidelines)
+        if st.session_state.messages:
+            first_msg = st.session_state.messages[0]
+            if first_msg["role"] == "interviewer":
+                # Split case question from guidelines
+                content = first_msg["content"]
+                # The guidelines start with "Take a moment..."
+                if "Take a moment" in content:
+                    parts = content.split("Take a moment")
+                    case_question = parts[0].strip()
+                    guidelines = "Take a moment" + parts[1] if len(parts) > 1 else ""
+                else:
+                    case_question = content
+                    guidelines = ""
 
-        for msg in st.session_state.messages:
+                # Case Question Box
+                st.markdown(f"""
+                <div style="
+                    background: linear-gradient(135deg, #1a1a2e, #16213e);
+                    border: 2px solid #0f3460;
+                    border-radius: 12px;
+                    padding: 24px;
+                    margin-bottom: 16px;
+                ">
+                    <div style="
+                        color: #e94560;
+                        font-size: 0.85em;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                        margin-bottom: 12px;
+                    ">CASE QUESTION — {state['case_title']}</div>
+                    <div style="
+                        color: #eee;
+                        font-size: 1em;
+                        line-height: 1.6;
+                        white-space: pre-wrap;
+                    ">{case_question}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                # Guidelines Box (separate, lighter style)
+                if guidelines:
+                    st.markdown(f"""
+                    <div style="
+                        background: #2a2a3a;
+                        border-left: 3px solid #888;
+                        border-radius: 4px;
+                        padding: 16px;
+                        margin-bottom: 24px;
+                        font-size: 0.9em;
+                        color: #bbb;
+                    ">
+                        <div style="
+                            font-weight: 600;
+                            margin-bottom: 8px;
+                            color: #999;
+                        ">INTERVIEWER</div>
+                        {guidelines}
+                    </div>
+                    """, unsafe_allow_html=True)
+
+        st.markdown("---")
+        st.markdown("**Dialogue**")
+
+        # Show conversation (skip first message as it's displayed above)
+        for msg in st.session_state.messages[1:]:
             if msg["role"] == "interviewer":
                 with st.chat_message("assistant", avatar="👔"):
                     st.write(msg["content"])

@@ -60,6 +60,11 @@ class InterviewState(TypedDict):
     red_flags_observed: List[str]  # Red flags actually observed in this interview
     green_flags_observed: List[str]  # Green flags actually observed in this interview
 
+    # Evaluator guidance (set by evaluator, used by interviewer)
+    evaluator_action: str  # DO_NOT_HELP, MINIMAL_HELP, LIGHT_HELP, CHALLENGE, LET_SHINE
+    evaluator_guidance: str  # Specific guidance for interviewer
+    data_to_share: Optional[str]  # Data evaluator has approved for sharing
+
     # Scoring (only populated when evaluator is called)
     question_scores: List[QuestionScore]
 
