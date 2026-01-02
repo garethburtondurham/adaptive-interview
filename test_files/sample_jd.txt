@@ -1,0 +1,24 @@
+Senior Product Manager - Job Description
+
+About the Role:
+We are looking for a Senior Product Manager to lead our B2B SaaS platform.
+
+Requirements:
+- 5+ years of product management experience
+- Experience with B2B SaaS products
+- Strong analytical skills and data-driven decision making
+- Excellent communication and stakeholder management
+- Technical background or ability to work closely with engineering
+- Experience with Agile/Scrum methodologies
+- SQL proficiency for data analysis
+
+Responsibilities:
+- Define product vision and roadmap
+- Work with engineering to deliver features
+- Analyze user data and market trends
+- Manage stakeholder expectations
+- Drive product metrics and KPIs
+
+Nice to have:
+- MBA or equivalent
+- Experience in fintech or enterprise software

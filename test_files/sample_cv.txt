@@ -1,0 +1,27 @@
+John Smith - Product Manager
+Contact: john.smith@email.com | LinkedIn: /in/johnsmith
+
+EXPERIENCE
+
+Product Manager, TechCorp Inc. (2020 - Present)
+- Led product development for enterprise dashboard, growing ARR by 40%
+- Managed team of 8 engineers and 2 designers
+- Implemented data-driven roadmap prioritization
+- Launched 3 major features that increased user engagement by 25%
+
+Associate Product Manager, StartupXYZ (2018 - 2020)
+- Launched mobile app with 50,000 downloads in first month
+- Conducted user research and defined product requirements
+- Worked with cross-functional teams
+
+Software Engineer, BigTech Co. (2016 - 2018)
+- Developed backend services for payment processing
+- Wrote technical specifications and documentation
+
+EDUCATION
+
+BS Computer Science, State University (2016)
+
+SKILLS
+
+Product Management, Agile, Jira, Figma, User Research, A/B Testing
